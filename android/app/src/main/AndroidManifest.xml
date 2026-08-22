@@ -1,4 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required in the MAIN manifest: the debug/profile manifests only
+         cover dev builds, so without these a release build has no network
+         and neither ads nor analytics would ever load. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Advertising ID, required for AdMob on Android 13+ (API 33). -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <!-- Notifications. POST_NOTIFICATIONS is the runtime permission on
+         Android 13+; RECEIVE_BOOT_COMPLETED lets the plugin restore the
+         scheduled reminders after a reboot, which would otherwise drop them.
+         Deliberately no SCHEDULE_EXACT_ALARM: the reminders are inexact. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <application
         android:label="coloro"
         android:name="${applicationName}"
@@ -34,6 +48,33 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- Without these two, a "send to all users" campaign from the
+             Firebase console arrives as a grey square on an unnamed default
+             channel. They set the tray icon and route console pushes into the
+             same channel the local reminders use. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_notify" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="coloro_reminders" />
+
+        <!-- Required by flutter_local_notifications for scheduled reminders,
+             and to re-arm them after a reboot or an app update. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

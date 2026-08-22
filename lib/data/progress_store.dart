@@ -14,6 +14,7 @@ class ProgressStore {
 
   static const _kUnlocked = 'unlocked_level';
   static const _kSound = 'sound_enabled';
+  static const _kNotifyAsked = 'notify_asked';
 
   /// Highest level the player may play (1-based).
   int get unlockedLevel => _prefs.getInt(_kUnlocked) ?? 1;
@@ -26,6 +27,13 @@ class ProgressStore {
   bool get soundEnabled => _prefs.getBool(_kSound) ?? true;
 
   Future<void> setSoundEnabled(bool value) => _prefs.setBool(_kSound, value);
+
+  /// Whether the notification explainer has already been shown. The OS prompt
+  /// can only be spent once, so this card is offered once and never again —
+  /// regardless of what the player answered.
+  bool get notifyAsked => _prefs.getBool(_kNotifyAsked) ?? false;
+
+  Future<void> markNotifyAsked() => _prefs.setBool(_kNotifyAsked, true);
 
   /// Records a finished level and unlocks the next one.
   Future<void> recordCompletion(int level) async {

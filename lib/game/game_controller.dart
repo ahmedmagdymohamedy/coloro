@@ -159,18 +159,29 @@ class GameController extends ChangeNotifier {
     return true;
   }
 
+  /// Hard ceiling on slots earned through rewarded ads. Past this the jam is
+  /// final and the level must be replayed — an unbounded rescue would let any
+  /// level be brute-forced by watching ads, which removes the puzzle.
+  static const maxSlots = 8;
+
   /// Rewarded-ad rescue: hands the machine one extra slot and lifts the
   /// jam so play continues from exactly where it stopped. More slots can
   /// only make a level easier, so a level's solvability proof still holds.
+  ///
+  /// Repeatable: each loss may be rescued again until [maxSlots] is reached.
   void grantExtraSlotAndResume() {
+    if (!canEarnExtraSlot) return;
     slots.add(null);
     _jamTimer = 0;
     if (phase == GamePhase.failed) phase = GamePhase.playing;
     notifyListeners();
   }
 
-  /// True once the player has already been rescued on this attempt.
-  bool get wasRescued => slots.length > slotCount;
+  /// Whether another rewarded rescue may still be offered on this attempt.
+  bool get canEarnExtraSlot => slots.length < maxSlots;
+
+  /// How many slots the machine currently has, base plus rescues.
+  int get activeSlotCount => slots.length;
 
   /// The fly-to-slot animation finished; the bottle starts drinking.
   void slotArrived(int slotIndex) {

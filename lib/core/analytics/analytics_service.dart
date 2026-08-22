@@ -58,6 +58,15 @@ class AnalyticsService {
   void adShown({required String format, required int level}) =>
       _log('ad_shown', {'ad_format': format, 'level': level});
 
+  /// The in-game explainer. Split from [notifyPermission] so the two drop-off
+  /// points stay separable: players who decline our card, and players who
+  /// accept it but then decline the OS dialog.
+  void notifyPromptAnswered({required bool accepted}) =>
+      _log('notify_prompt', {'accepted': accepted ? 1 : 0});
+
+  void notifyPermission({required bool granted}) =>
+      _log('notify_permission', {'granted': granted ? 1 : 0});
+
   void _log(String name, Map<String, Object> params) {
     final analytics = _analytics;
     if (analytics == null) return;

@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.4+4
 
 environment:
   sdk: ^3.12.2
@@ -40,6 +40,9 @@ dependencies:
   firebase_core: ^4.13.0
   firebase_analytics: ^12.4.6
   google_mobile_ads: ^9.1.0
+  firebase_messaging: ^16.5.0
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -50,6 +53,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -96,3 +100,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# App icon generation: dart run flutter_launcher_icons
+# Source art is produced by test/aso_generator_test.dart (ASO_OUT=aso).
+flutter_launcher_icons:
+  image_path: "aso/icon.png"
+  android: true
+  # The radial burst is most of what makes the icon read as a game; a flat
+  # fill here threw it away on every Android launcher.
+  adaptive_icon_background: "aso/icon_background.png"
+  adaptive_icon_foreground: "aso/icon_foreground.png"
+  ios: true
+  remove_alpha_ios: true
+  macos:
+    generate: true
+    image_path: "aso/icon.png"

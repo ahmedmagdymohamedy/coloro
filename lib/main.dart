@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'app/coloro_app.dart';
 import 'core/ads/ad_service.dart';
 import 'core/analytics/analytics_service.dart';
+import 'core/notifications/notification_service.dart';
+import 'data/progress_store.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -29,6 +31,17 @@ Future<void> main() async {
   await _initFirebase();
   unawaited(AdService.instance.init().catchError(
       (Object e) => debugPrint('AdMob init failed: \$e')));
+
+  // A returning player who is already past the onboarding levels must see the
+  // banner on the very first frame, not only after finishing another level.
+  AdService.instance.updateGate((await ProgressStore.load()).unlockedLevel);
+
+  // Reminders are armed before the first frame so a player who opens and
+  // immediately leaves still gets their 24h nudge. Both calls no-op until
+  // the player has granted permission after level 3.
+  await NotificationService.instance.init();
+  unawaited(NotificationService.instance.rescheduleReminders());
+  unawaited(NotificationService.instance.syncPushRegistration());
 
   runApp(const ColoroApp());
 }

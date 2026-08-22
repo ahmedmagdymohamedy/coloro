@@ -15,14 +15,22 @@ class LevelFailedOverlay extends StatefulWidget {
     required this.onRetry,
     required this.onMenu,
     this.onWatchAd,
+    this.slotsNow = 0,
+    this.slotsMax = 0,
   });
 
   final VoidCallback onRetry;
   final VoidCallback onMenu;
 
-  /// Rewarded-ad rescue: null when no ad is ready or the player already
-  /// used their one rescue this attempt.
+  /// Rewarded-ad rescue: null when no ad is ready or the machine has already
+  /// grown to its maximum number of slots.
   final VoidCallback? onWatchAd;
+
+  /// Slots the machine has now, and the ceiling rescues can reach. Shown so
+  /// the player can see the offer is finite rather than wondering why it
+  /// eventually stops appearing.
+  final int slotsNow;
+  final int slotsMax;
 
   @override
   State<LevelFailedOverlay> createState() => _LevelFailedOverlayState();
@@ -155,7 +163,11 @@ class _LevelFailedOverlayState extends State<LevelFailedOverlay>
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Watch a short ad to keep going',
+                                    widget.slotsMax > 0
+                                        ? 'Watch a short ad to keep going  ·  '
+                                            '${widget.slotsNow} of '
+                                            '${widget.slotsMax} slots'
+                                        : 'Watch a short ad to keep going',
                                     style: AppTypography.label(size: 12),
                                   ),
                                   const SizedBox(height: 14),

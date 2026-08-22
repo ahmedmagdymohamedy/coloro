@@ -25,18 +25,28 @@ class SlotBar extends StatelessWidget {
     return AnimatedBuilder(
       animation: repaint,
       builder: (context, _) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            for (var i = 0; i < controller.slots.length; i++)
-              _Slot(
-                key: ValueKey('slot_$i'),
-                anchorKey: slotKeys[i],
-                slot: controller.slots[i],
-                palette: controller.grid.palette,
-                time: controller.time,
-              ),
-          ],
+        // Rewarded rescues can grow the machine from 4 slots to 8, and eight
+        // fixed-width slots overrun a phone. Scaling the whole row down keeps
+        // every slot the same size as its neighbours instead of letting the
+        // last one clip, and scaleDown never enlarges the normal 4-slot case.
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < controller.slots.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                  child: _Slot(
+                    key: ValueKey('slot_$i'),
+                    anchorKey: slotKeys[i],
+                    slot: controller.slots[i],
+                    palette: controller.grid.palette,
+                    time: controller.time,
+                  ),
+                ),
+            ],
+          ),
         );
       },
     );

@@ -8,6 +8,7 @@ import '../../core/analytics/analytics_service.dart';
 import '../../core/audio/audio_controller.dart';
 import '../../core/audio/sfx.dart';
 import '../../core/haptics/haptics.dart';
+import '../../core/notifications/notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../data/bottle_factory.dart';
@@ -25,8 +26,13 @@ import '../../game/widgets/machine_frame.dart';
 import '../../game/widgets/pixel_canvas.dart';
 import '../../game/widgets/slot_bar.dart';
 import '../../game/widgets/tray_view.dart';
+import '../../shared/widgets/game_toast.dart';
 import 'widgets/level_complete_overlay.dart';
 import 'widgets/level_failed_overlay.dart';
+import 'widgets/notify_permission_sheet.dart';
+
+/// The player is asked to enable reminders once, after finishing this level.
+const _askForNotificationsAfterLevel = 3;
 
 /// One level of gameplay: loads the pixel grid, then wires the simulation,
 /// audio, haptics and VFX together around a single frame ticker.
@@ -73,8 +79,9 @@ class GameScreenState extends State<GameScreen>
 
   final _stackKey = GlobalKey();
   final _canvasKey = GlobalKey();
-  // 4 slots, plus one spare key for the rewarded-ad extra slot.
-  final _slotKeys = List.generate(5, (_) => GlobalKey());
+  // One key per slot the machine can ever have: 4 base slots plus every slot
+  // a rewarded rescue can add, up to GameController.maxSlots.
+  final _slotKeys = List.generate(GameController.maxSlots, (_) => GlobalKey());
   final _columnKeys = List.generate(4, (_) => GlobalKey());
 
   double _lastTickSoundAt = -1;
@@ -148,8 +155,10 @@ class GameScreenState extends State<GameScreen>
       _ticker.start();
       AnalyticsService.instance
           .gameStarted(level: widget.level.number, hard: widget.level.hard);
-      // Warm a rewarded ad now so the rescue offer is instant if they lose.
-      AdService.instance.prewarmRewarded();
+      // Warm both full-screen ads now: the rescue offer must be instant if
+      // they lose, and the interstitial must already be in hand by the time
+      // they finish — otherwise it slips to the following level.
+      AdService.instance.prewarm();
     } catch (e) {
       debugPrint('Level load failed: $e');
       if (mounted) setState(() => _loadFailed = true);
@@ -331,6 +340,8 @@ class GameScreenState extends State<GameScreen>
     );
     final store = await ProgressStore.load();
     await store.recordCompletion(widget.level.number);
+    // Finishing level 3 unlocks the banner for the rest of the session.
+    AdService.instance.updateGate(store.unlockedLevel);
 
     await Future<void>.delayed(const Duration(milliseconds: 650));
     if (!mounted) return;
@@ -352,6 +363,31 @@ class GameScreenState extends State<GameScreen>
     }
     AudioController.instance.play(Sfx.win);
     setState(() => _result = result);
+
+    await _maybeAskForNotifications(store);
+  }
+
+  /// Asked once, immediately after level 3 — the first moment the player has
+  /// demonstrably enjoyed the game. Asking on first launch converts far worse
+  /// and burns the one OS prompt we get.
+  Future<void> _maybeAskForNotifications(ProgressStore store) async {
+    if (widget.level.number != _askForNotificationsAfterLevel) return;
+    if (store.notifyAsked) return;
+    if (!NotificationService.instance.supported) return;
+    if (await NotificationService.instance.hasPermission()) return;
+
+    // Let the celebration land before interrupting it.
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+    if (!mounted) return;
+
+    await store.markNotifyAsked();
+    if (!mounted) return;
+    final wantsThem = await NotifyPermissionSheet.show(context);
+    AnalyticsService.instance.notifyPromptAnswered(accepted: wantsThem);
+    if (!wantsThem) return;
+
+    final granted = await NotificationService.instance.requestPermission();
+    AnalyticsService.instance.notifyPermission(granted: granted);
   }
 
   Offset? _centerOf(GlobalKey key) {
@@ -410,9 +446,44 @@ class GameScreenState extends State<GameScreen>
   // UI
   // ---------------------------------------------------------------------------
 
+  /// A single stray back press used to drop the player straight back to the
+  /// menu, throwing away an in-progress board. Leaving now must be asked for
+  /// twice, inside this window.
+  static const _backConfirmWindow = Duration(seconds: 2);
+  DateTime? _lastBackAt;
+
+  /// Only guard a board that still has something to lose. Once the level is
+  /// finished the progress is already saved, and a load failure has nothing
+  /// to protect, so back behaves normally in both cases.
+  bool get _needsExitConfirm => !_loadFailed && _result == null;
+
+  void _onBackPressed() {
+    final now = DateTime.now();
+    final last = _lastBackAt;
+    if (last != null && now.difference(last) <= _backConfirmWindow) {
+      GameToast.dismiss();
+      Navigator.of(context).pop(GameExit.toMenu);
+      return;
+    }
+    _lastBackAt = now;
+    Haptics.light();
+    GameToast.show(context, 'Press back again to leave this level');
+  }
+
   @override
   Widget build(BuildContext context) {
     final game = _game;
+    return PopScope<GameExit>(
+      canPop: !_needsExitConfirm,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _onBackPressed();
+      },
+      child: _buildBody(game),
+    );
+  }
+
+  Widget _buildBody(GameController? game) {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -543,11 +614,15 @@ class GameScreenState extends State<GameScreen>
               child: LevelFailedOverlay(
                 onRetry: () => Navigator.of(context).pop(GameExit.replay),
                 onMenu: () => Navigator.of(context).pop(GameExit.toMenu),
-                // One rescue per attempt, and only when an ad is ready.
+                // Repeatable: every jam can be bought off with another slot
+                // until the machine reaches its ceiling, after which the
+                // level has to be replayed.
                 onWatchAd:
-                    AdService.instance.isRewardedReady && !game.wasRescued
+                    AdService.instance.isRewardedReady && game.canEarnExtraSlot
                         ? _watchAdForExtraSlot
                         : null,
+                slotsNow: game.activeSlotCount,
+                slotsMax: GameController.maxSlots,
               ),
             ),
           if (_result != null)

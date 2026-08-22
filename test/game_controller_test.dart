@@ -229,4 +229,57 @@ void main() {
       expect(controller.phase, GamePhase.complete);
     });
   });
+
+  group('rewarded rescue', () {
+    GameController jammedController() {
+      final controller = GameController(
+        grid: tinyGrid(),
+        bottles: BottleFactory.build(tinyGrid(), seed: 1),
+        fillRate: 40,
+      );
+      autopilot(controller);
+      return controller;
+    }
+
+    test('starts at the base slot count', () {
+      expect(jammedController().activeSlotCount, 4);
+    });
+
+    test('is repeatable up to the ceiling, then stops being offered', () {
+      final controller = jammedController();
+
+      // Every jam may be bought off with another slot...
+      var granted = 0;
+      while (controller.canEarnExtraSlot) {
+        final before = controller.activeSlotCount;
+        controller.grantExtraSlotAndResume();
+        expect(controller.activeSlotCount, before + 1);
+        granted++;
+        expect(granted, lessThan(20), reason: 'must terminate');
+      }
+
+      expect(controller.activeSlotCount, GameController.maxSlots);
+      expect(granted, GameController.maxSlots - 4,
+          reason: '4 base slots grow to the ceiling');
+      expect(controller.canEarnExtraSlot, isFalse,
+          reason: 'past the ceiling the level must be replayed');
+    });
+
+    test('a grant past the ceiling is ignored rather than overflowing', () {
+      final controller = jammedController();
+      while (controller.canEarnExtraSlot) {
+        controller.grantExtraSlotAndResume();
+      }
+      controller
+        ..grantExtraSlotAndResume()
+        ..grantExtraSlotAndResume();
+      expect(controller.activeSlotCount, GameController.maxSlots);
+    });
+
+    test('resuming after a rescue lifts the failed phase', () {
+      final controller = jammedController()..phase = GamePhase.failed;
+      controller.grantExtraSlotAndResume();
+      expect(controller.phase, GamePhase.playing);
+    });
+  });
 }
