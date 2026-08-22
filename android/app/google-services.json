@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "570655138630",
+    "project_id": "coloro-e4a4b",
+    "storage_bucket": "coloro-e4a4b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570655138630:android:59cb98d53e5287b7de7b47",
+        "android_client_info": {
+          "package_name": "com.megz.coloro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb61crYCntzNuMfmmHLlkJWbfMEL0hk_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
