@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import '../domain/models/paint_bottle.dart';
 import '../domain/models/pixel_grid.dart';
+import '../game/drain_order.dart';
 
 /// Builds the bottle supply for a level and — crucially — the ORDER it is
 /// dealt into the tray.
@@ -25,7 +26,7 @@ abstract final class BottleFactory {
     int shuffleWindow = 1,
     int dealSeed = 0,
   }) {
-    final base = _baseOrder(grid, _chunk(grid, seed));
+    final base = _baseOrder(grid, _chunk(grid, seed), seed);
     if (shuffleWindow <= 1) return base;
     return _windowShuffle(base, shuffleWindow, math.Random(dealSeed));
   }
@@ -33,12 +34,16 @@ abstract final class BottleFactory {
   /// True when a winning line of play exists for this exact deal, under the
   /// real constraints: only the 4 column fronts are reachable, 5 slots, a
   /// docked bottle occupies its slot until it drinks its full capacity.
+  ///
+  /// [seed] must be the same level seed the runtime [GameController] runs
+  /// with — it selects the drain order, so a proof under a different seed
+  /// would describe a different game.
   static bool isDealSolvable(
     PixelGrid grid,
     List<PaintBottle> deal, {
+    int seed = 0,
     int maxNodes = 120000,
-  }) =>
-      _Solver(grid, deal).solve(maxNodes);
+  }) => _Solver(grid, deal, seed).solve(maxNodes);
 
   // ---------------------------------------------------------------------------
   // Supply
@@ -62,14 +67,17 @@ abstract final class BottleFactory {
           capacity = remaining; // no dangling 2-pixel bottles
         } else {
           final options = chunkSizes
-              .where((s) => s <= maxChunk && (s <= remaining - 6 || s == remaining))
+              .where(
+                (s) => s <= maxChunk && (s <= remaining - 6 || s == remaining),
+              )
               .toList();
           capacity = options.isEmpty
               ? math.min(remaining, maxChunk)
               : options[random.nextInt(options.length)];
         }
-        bottles
-            .add(PaintBottle(id: id++, colorIndex: color, capacity: capacity));
+        bottles.add(
+          PaintBottle(id: id++, colorIndex: color, capacity: capacity),
+        );
         remaining -= capacity;
       }
     }
@@ -79,14 +87,20 @@ abstract final class BottleFactory {
   /// A known-feasible baseline order: the dock order of a slot-constrained
   /// greedy solve (see [_Solver.witnessOrder]). Shuffling perturbs THIS.
   static List<PaintBottle> _baseOrder(
-      PixelGrid grid, List<PaintBottle> bottles) {
-    return _Solver(grid, bottles).witnessOrder() ?? bottles;
+    PixelGrid grid,
+    List<PaintBottle> bottles,
+    int seed,
+  ) {
+    return _Solver(grid, bottles, seed).witnessOrder() ?? bottles;
   }
 
   /// Permutes the order within sliding windows of [window] bottles, so a
   /// bottle can drift at most ~window places from where it is needed.
   static List<PaintBottle> _windowShuffle(
-      List<PaintBottle> order, int window, math.Random rnd) {
+    List<PaintBottle> order,
+    int window,
+    math.Random rnd,
+  ) {
     final out = List<PaintBottle>.from(order);
     for (var start = 0; start < out.length; start += window) {
       final end = math.min(start + window, out.length);
@@ -103,12 +117,12 @@ abstract final class BottleFactory {
 /// (the drain is strictly bottom-up per column), which makes states small
 /// enough to memoize.
 class _Solver {
-  _Solver(this.grid, this.deal)
-      : cols = grid.cols,
-        rows = grid.rows,
-        drunk = List<int>.filled(grid.cols, 0),
-        colPtr = List<int>.filled(BottleFactory.columnCount, 0),
-        slots = List<_Docked?>.filled(BottleFactory.slotCount, null) {
+  _Solver(this.grid, this.deal, this.seed)
+    : cols = grid.cols,
+      rows = grid.rows,
+      drunk = List<int>.filled(grid.cols, 0),
+      colPtr = List<int>.filled(BottleFactory.columnCount, 0),
+      slots = List<_Docked?>.filled(BottleFactory.slotCount, null) {
     // The tray, as the controller deals it.
     tray = List.generate(BottleFactory.columnCount, (_) => <PaintBottle>[]);
     for (var i = 0; i < deal.length; i++) {
@@ -119,6 +133,9 @@ class _Solver {
 
   final PixelGrid grid;
   final List<PaintBottle> deal;
+
+  /// Level seed — feeds [DrainOrder] exactly as the runtime does.
+  final int seed;
   final int cols, rows;
 
   late final List<List<PaintBottle>> tray;
@@ -136,17 +153,21 @@ class _Solver {
   }
 
   /// The column the runtime would drink from: deepest remaining row (i.e.
-  /// fewest cells drunk), tie-break leftmost.
+  /// fewest cells drunk), then [DrainOrder] among the ties — the identical
+  /// rule `GameController._drink` uses, which is what makes this a proof
+  /// about the real game rather than about a simplified model of it.
   int? _pickColumn(int color) {
-    var best = -1, bestDrunk = 1 << 30;
+    var bestDrunk = 1 << 30;
     for (var x = 0; x < cols; x++) {
       if (_colorAtBottom(x) != color) continue;
-      if (drunk[x] < bestDrunk) {
-        bestDrunk = drunk[x];
-        best = x;
-      }
+      if (drunk[x] < bestDrunk) bestDrunk = drunk[x];
     }
-    return best == -1 ? null : best;
+    if (bestDrunk == 1 << 30) return null;
+    final candidates = <int>[
+      for (var x = 0; x < cols; x++)
+        if (_colorAtBottom(x) == color && drunk[x] == bestDrunk) x,
+    ];
+    return DrainOrder.pick(candidates, seed, rows - 1 - bestDrunk);
   }
 
   int _takableFor(int color) {
@@ -339,14 +360,10 @@ enum _StepKind { drink, pop, dock }
 
 class _Step {
   _Step.drink(this.slot, this.column)
-      : kind = _StepKind.drink,
-        poppedColor = -1;
-  _Step.pop(this.slot, this.poppedColor)
-      : kind = _StepKind.pop,
-        column = -1;
-  _Step.dock(this.slot, this.column)
-      : kind = _StepKind.dock,
-        poppedColor = -1;
+    : kind = _StepKind.drink,
+      poppedColor = -1;
+  _Step.pop(this.slot, this.poppedColor) : kind = _StepKind.pop, column = -1;
+  _Step.dock(this.slot, this.column) : kind = _StepKind.dock, poppedColor = -1;
 
   final _StepKind kind;
   final int slot;

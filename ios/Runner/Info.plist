@@ -14,8 +14,18 @@
 			<string>cstr6suwn9.skadnetwork</string>
 		</dict>
 	</array>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you.</string>
+	<!-- No NSUserTrackingUsageDescription on purpose. The app never calls the
+	     ATT framework, so it can never be granted tracking permission; while
+	     the key was present App Store Connect refused the submission with
+	     "update your App Privacy response to indicate that data collected
+	     from this app will be used for tracking purposes, or update your app
+	     binary". AdMob serves contextual ads without the IDFA. Put the key
+	     back only together with a real ATT + UMP consent flow. -->
+	<!-- The app makes no encrypted calls of its own; the SDKs use standard
+	     HTTPS, which is exempt. Declaring it here stops Connect asking on
+	     every upload. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

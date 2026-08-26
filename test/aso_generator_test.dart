@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Renders every store asset (icon, feature graphic, phone screenshots)
@@ -21,6 +22,49 @@ import 'package:shared_preferences/shared_preferences.dart';
 ///   ASO_OUT=aso flutter test test/aso_generator_test.dart
 ///
 /// It is a generator, not a check: without ASO_OUT it does nothing.
+
+/// One screenshot set: the store slot it fills, and the device geometry the
+/// app is driven at to fill it.
+class _ShotSet {
+  const _ShotSet(this.prefix, this.width, this.height, this.dpr,
+      {this.stripAlpha = false});
+
+  final String prefix;
+  final int width;
+  final int height;
+
+  /// Real device pixel ratio, so the app lays out at the same *logical* size
+  /// the target hardware gives it. Capturing 2064x2752 at ratio 3 would hand
+  /// the game a 688pt-wide phone layout stretched onto an iPad.
+  final double dpr;
+
+  /// Write RGB instead of RGBA. App Store Connect rejects screenshots with
+  /// an alpha channel; Play accepts them, and its assets are already
+  /// published, so only the iOS sets are flattened.
+  final bool stripAlpha;
+}
+
+/// Play wants 1080x1920 phone shots. Apple stopped requiring the smaller
+/// display classes in April 2025: it scales the largest set in each family
+/// down to cover every other device, so only 6.9" iPhone (440x956 pt) and
+/// 13" iPad (1032x1376 pt) are produced. The iPad set is not optional here —
+/// `TARGETED_DEVICE_FAMILY = "1,2"` means the app is listed for iPad.
+const _shotSets = [
+  _ShotSet('screenshot', 1080, 1920, 3),
+  _ShotSet('ios_iphone_69', 1320, 2868, 3, stripAlpha: true),
+  _ShotSet('ios_ipad_13', 2064, 2752, 2, stripAlpha: true),
+];
+
+/// Signature of the PNG writer `main` hands to [_captureSet].
+typedef _Render = Future<void> Function(
+  WidgetTester tester,
+  String name,
+  int width,
+  int height,
+  void Function(Canvas canvas, Size size) painter, {
+  bool stripAlpha,
+});
+
 void main() {
   final outDir = Platform.environment['ASO_OUT'];
 
@@ -57,8 +101,9 @@ void main() {
     String name,
     int width,
     int height,
-    void Function(Canvas canvas, Size size) painter,
-  ) async {
+    void Function(Canvas canvas, Size size) painter, {
+    bool stripAlpha = false,
+  }) async {
     await tester.runAsync(() async {
       final recorder = ui.PictureRecorder();
       final canvas = Canvas(recorder);
@@ -66,11 +111,20 @@ void main() {
       final picture = recorder.endRecording();
       final image = await picture.toImage(width, height);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
-      File('$outDir/$name').writeAsBytesSync(bytes!.buffer.asUint8List());
+      var out = bytes!.buffer.asUint8List();
+      if (stripAlpha) {
+        // App Store Connect refuses any screenshot carrying an alpha
+        // channel, and Flutter's PNG encoder always writes RGBA. Every
+        // pixel here is painted over a full-bleed opaque backdrop, so
+        // dropping the channel is lossless — it just makes the file
+        // uploadable.
+        out = img.encodePng(img.decodePng(out)!.convert(numChannels: 3));
+      }
+      File('$outDir/$name').writeAsBytesSync(out);
       picture.dispose();
       image.dispose();
       // ignore: avoid_print
-      print('  -> $name ($width x $height)');
+      print('  -> $name ($width x $height)${stripAlpha ? ' RGB' : ''}');
     });
   }
 
@@ -97,103 +151,114 @@ void main() {
     await render(tester, 'feature_graphic.png', 1024, 500, _paintFeatureGraphic);
   });
 
-  testWidgets('screenshots', (tester) async {
-    if (outDir == null) return;
+  for (final set in _shotSets) {
+    testWidgets('screenshots ${set.prefix}', (tester) async {
+      if (outDir == null) return;
+      await _captureSet(tester, set, render);
+    });
+  }
+}
 
-    SharedPreferences.setMockInitialValues({'unlocked_level': 24});
-    tester.view.physicalSize = const Size(1080, 1920);
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.reset);
+/// Drives the real game at [set]'s geometry and writes its five store
+/// screenshots. Every set runs the identical script, so the App Store and
+/// Play listings can never tell different stories about the game.
+Future<void> _captureSet(
+  WidgetTester tester,
+  _ShotSet set,
+  _Render render,
+) async {
+  SharedPreferences.setMockInitialValues({'unlocked_level': 24});
+  tester.view.physicalSize = Size(set.width.toDouble(), set.height.toDouble());
+  tester.view.devicePixelRatio = set.dpr;
+  addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(const RepaintBoundary(child: ColoroApp()));
-    await tester.runAsync(() => Future.delayed(const Duration(seconds: 2)));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+  await tester.pumpWidget(const RepaintBoundary(child: ColoroApp()));
+  await tester.runAsync(() => Future.delayed(const Duration(seconds: 2)));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
 
-    Future<void> shot(String file, String headline, String sub) async {
-      final boundary = find
-          .byType(RepaintBoundary)
-          .evaluate()
-          .first
-          .renderObject! as RenderRepaintBoundary;
-      late ui.Image raw;
-      await tester.runAsync(() async {
-        raw = await boundary.toImage(pixelRatio: 3);
-      });
-      await render(tester, file, 1080, 1920,
-          (c, s) => _composeScreenshot(c, s, raw, headline, sub));
-      raw.dispose();
-    }
+  Future<void> shot(int slot, String headline, String sub) async {
+    final boundary = find
+        .byType(RepaintBoundary)
+        .evaluate()
+        .first
+        .renderObject! as RenderRepaintBoundary;
+    late ui.Image raw;
+    await tester.runAsync(() async {
+      raw = await boundary.toImage(pixelRatio: set.dpr);
+    });
+    await render(tester, '${set.prefix}_$slot.png', set.width, set.height,
+        (c, s) => _composeScreenshot(c, s, raw, headline, sub),
+        stripAlpha: set.stripAlpha);
+    raw.dispose();
+  }
 
-    // Slot 1 is a promo hero, not an app capture: the first screenshot has
-    // to sell the concept, and a raw menu shot cannot.
-    await render(tester, 'screenshot_1.png', 1080, 1920, _paintPromoHero);
+  // Slot 1 is a promo hero, not an app capture: the first screenshot has
+  // to sell the concept, and a raw menu shot cannot.
+  await render(
+      tester, '${set.prefix}_1.png', set.width, set.height, _paintPromoHero,
+      stripAlpha: set.stripAlpha);
 
-    // Open a colourful mid-campaign level.
-    final catalog = await tester.runAsync(LevelCatalog.load);
-    final level = catalog!.levels[19];
-    Navigator.of(tester.element(find.text('PLAY'))).push(
-      MaterialPageRoute<void>(
-        builder: (_) => GameScreen(level: level, hasNextLevel: true),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-    final trayFinder = find.byWidgetPredicate(
-      (w) => w.runtimeType.toString() == '_TrayColumn',
-    );
-    for (var attempt = 0;
-        attempt < 20 && trayFinder.evaluate().isEmpty;
-        attempt++) {
-      await tester
-          .runAsync(() => Future.delayed(const Duration(milliseconds: 400)));
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+  // Open a colourful mid-campaign level.
+  final catalog = await tester.runAsync(LevelCatalog.load);
+  final level = catalog!.levels[19];
+  Navigator.of(tester.element(find.text('PLAY'))).push(
+    MaterialPageRoute<void>(
+      builder: (_) => GameScreen(level: level, hasNextLevel: true),
+    ),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 600));
+  final trayFinder = find.byWidgetPredicate(
+    (w) => w.runtimeType.toString() == '_TrayColumn',
+  );
+  for (var attempt = 0;
+      attempt < 20 && trayFinder.evaluate().isEmpty;
+      attempt++) {
+    await tester
+        .runAsync(() => Future.delayed(const Duration(milliseconds: 400)));
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 
-    final game =
-        tester.state<GameScreenState>(find.byType(GameScreen)).debugGame!;
+  final game =
+      tester.state<GameScreenState>(find.byType(GameScreen)).debugGame!;
 
-    Future<void> play(int ticks) async {
-      for (var i = 0; i < ticks; i++) {
-        for (var c = 0; c < 4; c++) {
-          final col = game.tray[c];
-          if (col.isNotEmpty &&
-              game.hasFreeSlot &&
-              game.takableCountFor(col.first.colorIndex) > 0) {
-            await tester.tap(trayFinder.at(c), warnIfMissed: false);
-          }
+  Future<void> play(int ticks) async {
+    for (var i = 0; i < ticks; i++) {
+      for (var c = 0; c < 4; c++) {
+        final col = game.tray[c];
+        if (col.isNotEmpty &&
+            game.hasFreeSlot &&
+            game.takableCountFor(col.first.colorIndex) > 0) {
+          await tester.tap(trayFinder.at(c), warnIfMissed: false);
         }
-        await tester.pump(const Duration(milliseconds: 100));
       }
-    }
-
-    await play(12);
-    await shot('screenshot_2.png', 'Drain it colour by colour',
-        'Bottles drink the bottom edge');
-
-    await play(60);
-    await shot('screenshot_3.png', 'Pick the right bottle',
-        'Guess wrong and the machine jams');
-
-    await play(140);
-    await shot('screenshot_4.png', 'Watch the picture vanish',
-        'Oddly satisfying, every time');
-
-    Navigator.of(tester.element(find.byType(GameScreen))).pop();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 700));
-    // Never ship a screenshot with a spinner in it: wait for the carousel
-    // previews to finish decoding.
-    for (var i = 0;
-        i < 30 && find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
-        i++) {
-      await tester
-          .runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
       await tester.pump(const Duration(milliseconds: 100));
     }
-    await shot('screenshot_5.png', 'Replay any level',
-        'Swipe through your collection');
-  });
+  }
+
+  await play(12);
+  await shot(2, 'Drain it colour by colour', 'Bottles drink the bottom edge');
+
+  await play(60);
+  await shot(3, 'Pick the right bottle', 'Guess wrong and the machine jams');
+
+  await play(140);
+  await shot(4, 'Watch the picture vanish', 'Oddly satisfying, every time');
+
+  Navigator.of(tester.element(find.byType(GameScreen))).pop();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 700));
+  // Never ship a screenshot with a spinner in it: wait for the carousel
+  // previews to finish decoding.
+  for (var i = 0;
+      i < 30 && find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+      i++) {
+    await tester
+        .runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+  await shot(5, 'Replay any level', 'Swipe through your collection');
 }
 
 // ---------------------------------------------------------------------------
@@ -558,36 +623,44 @@ void _promoFlask(Canvas canvas, Offset centre, double r, Color color) {
 /// capture cannot sell a puzzle nobody has seen yet.
 void _paintPromoHero(Canvas canvas, Size size) {
   final w = size.width, h = size.height;
+  // Every hard-coded length below was tuned against a 1080x1920 canvas. iOS
+  // asks for taller *and* squarer canvases, so scale by whichever axis is
+  // tightest — sizing off width alone overflows the 3:4 iPad panel.
+  final k = _scaleFor(size);
   _paintBackdrop(canvas, Size(w, h * 1.25));
 
-  // Wordmark in candy tiles.
+  // Wordmark in candy tiles. Height-capped as well as width-derived: on a
+  // 3:4 canvas a purely width-based tile grows into the tagline.
   const letters = 'COLORO';
   const tileColors = [_pink, _orange, _yellow, _green, _cyan, Color(0xFFB197FC)];
-  final tile = w * 0.135;
-  final startX = (w - (tile * 6 + 14 * 5)) / 2;
+  final tile = math.min(w * 0.135, h * 0.076);
+  final gap = 14 * k;
+  final startX = (w - (tile * 6 + gap * 5)) / 2;
   for (var i = 0; i < letters.length; i++) {
     _letterTile(
       canvas,
-      Rect.fromLTWH(startX + i * (tile + 14), h * 0.075, tile, tile * 1.12),
+      Rect.fromLTWH(startX + i * (tile + gap), h * 0.075, tile, tile * 1.12),
       letters[i],
       tileColors[i],
     );
   }
   _text(canvas, 'Drain the pixels. Reveal the art.', Offset(w / 2, h * 0.185),
-      size: 44, weight: 600, color: const Color(0xFFE6DBFF),
+      size: 44 * k, weight: 600, color: const Color(0xFFE6DBFF),
       align: TextAlign.center, maxWidth: w * 0.9);
 
-  // The board: top half painted, bottom half already drunk away.
-  final boardSide = w * 0.80;
+  // The board: top half painted, bottom half already drunk away. It is
+  // square, so on a squarer canvas the height is what runs out first — an
+  // 0.80w board on iPad would swallow the bottle row underneath it.
+  final boardSide = math.min(w * 0.80, h * 0.45);
   final board =
       Rect.fromLTWH((w - boardSide) / 2, h * 0.245, boardSide, boardSide);
   canvas
     ..drawRRect(
-      RRect.fromRectAndRadius(board.inflate(22), const Radius.circular(46)),
+      RRect.fromRectAndRadius(board.inflate(22 * k), Radius.circular(46 * k)),
       Paint()..color = const Color(0xFF6C5DA8),
     )
     ..drawRRect(
-      RRect.fromRectAndRadius(board, const Radius.circular(30)),
+      RRect.fromRectAndRadius(board, Radius.circular(30 * k)),
       Paint()..color = const Color(0xFF150F2C),
     );
   const art = [
@@ -617,7 +690,7 @@ void _paintPromoHero(Canvas canvas, Size size) {
 
   // Bottle row, mirroring the machine's slots.
   const rowColors = [_pink, _cyan, _yellow, _green];
-  final flaskR = w * 0.070;
+  final flaskR = math.min(w * 0.070, h * 0.0395);
   for (var i = 0; i < 4; i++) {
     // Clear of the board frame: a cork poking through it reads as a bug.
     _promoFlask(
@@ -635,24 +708,32 @@ void _paintPromoHero(Canvas canvas, Size size) {
   for (final b in badges) {
     final tp = TextPainter(
       text: TextSpan(
-          text: b, style: AppTypography.style(size: 30, weight: 700)),
+          text: b, style: AppTypography.style(size: 30 * k, weight: 700)),
       textDirection: TextDirection.ltr,
     )..layout();
-    widths.add(tp.width + 46);
+    widths.add(tp.width + 46 * k);
   }
-  final total = widths.reduce((a, b) => a + b) + 24 * (badges.length - 1);
+  final total = widths.reduce((a, b) => a + b) + 24 * k * (badges.length - 1);
   bx = (w - total) / 2;
   for (var i = 0; i < badges.length; i++) {
-    final rect = Rect.fromLTWH(bx, h * 0.845, widths[i], 76);
+    final rect = Rect.fromLTWH(bx, h * 0.845, widths[i], 76 * k);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(38)),
+      RRect.fromRectAndRadius(rect, Radius.circular(38 * k)),
       Paint()..color = Colors.white.withValues(alpha: 0.13),
     );
-    _text(canvas, badges[i], Offset(rect.center.dx, rect.top + 18),
-        size: 30, weight: 700, color: _yellow, align: TextAlign.center);
-    bx += widths[i] + 24;
+    _text(canvas, badges[i], Offset(rect.center.dx, rect.top + 18 * k),
+        size: 30 * k, weight: 700, color: _yellow, align: TextAlign.center);
+    bx += widths[i] + 24 * k;
   }
 }
+
+/// Uniform scale for art authored against the original 1080x1920 phone
+/// canvas. Deliberately the *smaller* of the two ratios: scaling text by
+/// width alone makes a headline wrap on the iPad panel and collide with the
+/// subtitle underneath it. At 1080x1920 this is exactly 1, so the Play
+/// assets come out byte-for-byte as before.
+double _scaleFor(Size size) =>
+    math.min(size.width / 1080, size.height / 1920);
 
 void _text(
   Canvas canvas,
@@ -771,6 +852,7 @@ void _composeScreenshot(
   String sub,
 ) {
   final w = size.width;
+  final k = _scaleFor(size);
   canvas.drawRect(
     Offset.zero & size,
     Paint()
@@ -781,26 +863,29 @@ void _composeScreenshot(
       ).createShader(Offset.zero & size),
   );
 
-  _text(canvas, headline, Offset(w / 2, 92),
-      size: 76,
+  _text(canvas, headline, Offset(w / 2, 92 * k),
+      size: 76 * k,
       weight: 700,
       align: TextAlign.center,
       maxWidth: w * 0.9,
-      shadows: const [
-        Shadow(color: Color(0xAA000000), offset: Offset(0, 4), blurRadius: 12),
+      shadows: [
+        Shadow(
+            color: const Color(0xAA000000),
+            offset: Offset(0, 4 * k),
+            blurRadius: 12 * k),
       ]);
-  _text(canvas, sub, Offset(w / 2, 206),
-      size: 38,
+  _text(canvas, sub, Offset(w / 2, 206 * k),
+      size: 38 * k,
       weight: 600,
       color: const Color(0xFFD9CBFF),
       align: TextAlign.center,
       maxWidth: w * 0.86);
 
-  const bandH = 300.0;
+  final bandH = 300.0 * k;
   // Fit the whole device screen: a clipped tray reads as a broken mockup.
   final scale = math.min(
     (w * 0.90) / shot.width,
-    (size.height - bandH - 40) / shot.height,
+    (size.height - bandH - 40 * k) / shot.height,
   );
   final dest = Rect.fromLTWH(
     (w - shot.width * scale) / 2,
@@ -808,10 +893,10 @@ void _composeScreenshot(
     shot.width * scale,
     shot.height * scale,
   );
-  final rrect = RRect.fromRectAndRadius(dest, const Radius.circular(46));
+  final rrect = RRect.fromRectAndRadius(dest, Radius.circular(46 * k));
   canvas
     ..drawRRect(
-      rrect.shift(const Offset(0, 16)),
+      rrect.shift(Offset(0, 16 * k)),
       Paint()..color = const Color(0x66000000),
     )
     ..save()
@@ -827,7 +912,7 @@ void _composeScreenshot(
       rrect,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
+        ..strokeWidth = 6 * k
         ..color = Colors.white.withValues(alpha: 0.35),
     );
 }

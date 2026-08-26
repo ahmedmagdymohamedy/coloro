@@ -10,7 +10,7 @@ against Play's limits.
 ```
 Coloro: Pixel Color Sort
 ```
-*23 chars.* Brand first (so it's searchable once you have installs), then
+*24 chars.* Brand first (so it's searchable once you have installs), then
 the two highest-volume keywords this game can honestly rank for:
 **color sort** and **pixel**. Do not pad it with extra words — Play now
 penalises keyword-stuffed titles, and a short name is what shows in full
@@ -27,7 +27,7 @@ on the search results row.
 ```
 Sort colored bottles, drain the pixel art, and solve 300 offline puzzles.
 ```
-*72 chars.* This is the highest-weighted indexed text after the title, and
+*73 chars.* This is the highest-weighted indexed text after the title, and
 it's the line people actually read before tapping **Install**. It carries
 `sort`, `color`, `pixel art`, `puzzle`, `offline`, and states the loop in
 one sentence.
@@ -88,7 +88,7 @@ neatly disassemble itself.
 Free to play. Download Coloro and start draining.
 ```
 
-*~1,650 chars.* Structure follows what converts on Play: a hook line, then
+*1,936 chars of 4,000.* Structure follows what converts on Play: a hook line, then
 scannable emoji-headed blocks, keyword coverage spread naturally
 (`color sort`, `pixel art`, `puzzle`, `offline`, `water sort`, `nonogram`),
 and a clear closing call to action. Play indexes this text, but readability

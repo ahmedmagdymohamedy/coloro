@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../domain/models/level_result.dart';
 import '../domain/models/paint_bottle.dart';
 import '../domain/models/pixel_grid.dart';
+import 'drain_order.dart';
 import 'game_events.dart';
 
 enum GamePhase { playing, complete, failed }
@@ -60,10 +61,8 @@ class GameController extends ChangeNotifier {
     required List<PaintBottle> bottles,
     this.slotCount = 4,
     this.columnCount = 4,
-    this.fillRate = 4.5,
-    // Kept for call-site stability; the drain order is fully deterministic.
-    // ignore: avoid_unused_constructor_parameters
-    int seed = 0,
+    this.fillRate = 7.0,
+    this.seed = 0,
   }) {
     // Deal bottles round-robin into tray columns.
     tray = List.generate(columnCount, (_) => <PaintBottle>[]);
@@ -78,6 +77,10 @@ class GameController extends ChangeNotifier {
   final PixelGrid grid;
   final int slotCount;
   final int columnCount;
+
+  /// The level number. Seeds [DrainOrder], so a level always drains in the
+  /// same scattered order — and in the same order the solver proved.
+  final int seed;
 
   /// Pixels per second a docked bottle drinks while matches exist.
   final double fillRate;
@@ -242,15 +245,20 @@ class GameController extends ChangeNotifier {
     while (slot.budget >= 1 && slot.remaining > 0 && matches.isNotEmpty) {
       slot.budget -= 1;
 
-      // SEQUENTIAL erase: always take the lowest remaining row first, and
-      // sweep it left → right (matches are built in ascending column
-      // order, so the first entry at the deepest row wins). The picture
-      // drains row by row from the bottom up instead of popping at random.
-      var pick = 0;
+      // SEQUENTIAL erase: always take the lowest remaining row first, so
+      // the picture still drains row by row from the bottom up. WITHIN that
+      // row the column is chosen by [DrainOrder] — scattered rather than a
+      // left-to-right sweep, and identical to what the solver proved.
+      var deepest = matches[0].row;
       for (var k = 1; k < matches.length; k++) {
-        if (matches[k].row > matches[pick].row) pick = k;
+        if (matches[k].row > deepest) deepest = matches[k].row;
       }
-      final column = matches[pick].column;
+      final candidates = <int>[
+        for (final m in matches)
+          if (m.row == deepest) m.column,
+      ];
+      final column = DrainOrder.pick(candidates, seed, deepest);
+      final pick = matches.indexWhere((m) => m.column == column);
 
       // Exactly ONE pixel per take: the column's bottom cell.
       final cell = bottomCellOf(column);

@@ -60,17 +60,17 @@ class AdService {
 
   late final FullScreenAdCache<InterstitialAd> _interstitials =
       FullScreenAdCache<InterstitialAd>(
-    label: 'Interstitial',
-    loader: _loadInterstitial,
-    disposer: (ad) => ad.dispose(),
-  );
+        label: 'Interstitial',
+        loader: _loadInterstitial,
+        disposer: (ad) => ad.dispose(),
+      );
 
   late final FullScreenAdCache<RewardedAd> _rewardeds =
       FullScreenAdCache<RewardedAd>(
-    label: 'Rewarded',
-    loader: _loadRewarded,
-    disposer: (ad) => ad.dispose(),
-  );
+        label: 'Rewarded',
+        loader: _loadRewarded,
+        disposer: (ad) => ad.dispose(),
+      );
 
   Future<void> init() async {
     if (_initialised || !supported) return;
@@ -143,17 +143,21 @@ class AdService {
 
   bool get _tooSoonForInterstitial {
     final last = _lastInterstitialAt;
-    return last != null &&
-        DateTime.now().difference(last) < minInterstitialGap;
+    return last != null && DateTime.now().difference(last) < minInterstitialGap;
   }
 
   /// Shows the between-levels interstitial when one is ready and the player
   /// is past [interstitialFromLevel]. Returns true when an ad was shown.
   ///
+  /// [level] is the level being *left* — whether it was won or lost. Both
+  /// are real transitions and both show an ad; a loss followed by a retry
+  /// used to be the one exit from a level that never did, which is both a
+  /// worse-monetised path and an inconsistent one for the player.
+  ///
   /// Never throws and never hangs: the caller navigates as soon as this
   /// resolves, so a broken ad must not strand the player on a finished level.
-  Future<bool> maybeShowInterstitial({required int completedLevel}) async {
-    if (!supported || completedLevel < interstitialFromLevel) return false;
+  Future<bool> maybeShowInterstitial({required int level}) async {
+    if (!supported || level < interstitialFromLevel) return false;
     if (_showing) return false;
     if (_tooSoonForInterstitial) {
       debugPrint('Interstitial: suppressed, one was shown moments ago.');

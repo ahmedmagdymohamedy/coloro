@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/display_palette.dart';
 import '../../domain/models/paint_bottle.dart';
 import '../game_controller.dart';
 import 'bottle_view.dart';
@@ -37,9 +38,10 @@ class TrayView extends StatelessWidget {
             borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
             boxShadow: [
               BoxShadow(
-                  color: Color(0x44000000),
-                  blurRadius: 12,
-                  offset: Offset(0, -4)),
+                color: Color(0x44000000),
+                blurRadius: 12,
+                offset: Offset(0, -4),
+              ),
             ],
           ),
           child: Row(
@@ -79,7 +81,10 @@ class _TrayColumn extends StatelessWidget {
   static const _rowTop = [0.0, 66.0, 117.0];
   static const _rowW = [50.0, 40.0, 40.0];
   static const _rowH = [60.0, 46.0, 46.0];
-  static const _rowDim = [0.0, 0.45, 0.60];
+  // Depth, NOT dimming: queued rows soften their highlights and sink into
+  // a deeper shadow, but their liquid keeps its exact colour — reading the
+  // queue's colours ahead of time is how the player plans.
+  static const _rowDepth = [0.0, 0.5, 0.8];
   static const _height = 184.0;
 
   @override
@@ -105,9 +110,7 @@ class _TrayColumn extends StatelessWidget {
                 child: SizedBox(key: anchorKey, width: _rowW[0], height: 60),
               ),
             ),
-            for (var i = 0;
-                i < bottles.length && i < TrayView.visibleRows;
-                i++)
+            for (var i = 0; i < bottles.length && i < TrayView.visibleRows; i++)
               AnimatedPositioned(
                 key: ValueKey('bottle_${bottles[i].id}'),
                 duration: const Duration(milliseconds: 260),
@@ -124,12 +127,14 @@ class _TrayColumn extends StatelessWidget {
                     height: _rowH[i],
                     child: _EnterPop(
                       child: TweenAnimationBuilder<double>(
-                        tween: Tween(end: _rowDim[i]),
+                        tween: Tween(end: _rowDepth[i]),
                         duration: const Duration(milliseconds: 260),
-                        builder: (context, dim, _) => BottleView(
-                          color: Color(palette[bottles[i].colorIndex]),
+                        builder: (context, depth, _) => BottleView(
+                          color: DisplayPalette.of(
+                            palette[bottles[i].colorIndex],
+                          ),
                           label: '${bottles[i].capacity}',
-                          dim: dim,
+                          depth: depth,
                           // Fresh flasks wait nearly empty; they fill up
                           // with collected beads once docked.
                           fill: 0.14,

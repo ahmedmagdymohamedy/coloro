@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../core/theme/display_palette.dart';
 import '../game_controller.dart';
 import 'bottle_view.dart';
 
@@ -95,15 +96,15 @@ class _Slot extends StatelessWidget {
               width: 38,
               height: 48,
               child: BottleView(
-                color: Color(palette[s.bottle.colorIndex]),
+                color: DisplayPalette.of(palette[s.bottle.colorIndex]),
                 label: '${s.remaining}',
                 fill: 1 - s.remaining / s.bottle.capacity,
-                dim: starving ? 0.45 : 0,
+                // Never dimmed: the alarm is a ring AROUND the flask, so
+                // a starving bottle's colour stays perfectly readable.
+                alarm: starving ? 0.55 + 0.45 * math.sin(time * 7).abs() : 0,
                 wobble: starving
                     ? math.sin(time * 5 + s.bottle.id) * 0.10
-                    : (working
-                        ? math.sin(time * 22 + s.bottle.id) * 0.05
-                        : 0),
+                    : (working ? math.sin(time * 22 + s.bottle.id) * 0.05 : 0),
                 squash: working
                     ? 1 + math.sin(time * 26 + s.bottle.id * 2) * 0.04
                     : 1,
