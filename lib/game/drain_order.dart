@@ -1,48 +1,47 @@
 /// Which bottom-edge cell a docked bottle drinks next.
 ///
-/// The rule the game is built on never changes: a bottle may only take the
-/// **lowest remaining pixel of a column**, and it always takes the deepest
-/// one available. What this file decides is the *tie-break* — which of the
-/// equally-deep matching columns it reaches for.
+/// The rule the game is built on: a bottle may only take the **lowest
+/// remaining pixel of a column**, and it always takes the deepest one
+/// available. What this file owns is the *tie-break* — which of the equally
+/// deep matching columns it reaches for — and it exists so that the live
+/// [GameController] and the solvability solver in `bottle_factory.dart`
+/// call literally the same function. The winning line the solver proves is
+/// therefore the winning line the player gets.
 ///
-/// That used to be "the leftmost one", which made every row erase itself as
-/// a strict left-to-right typewriter sweep. Playtesting called it out
-/// directly: it should drain from a row in a scattered order, not always
-/// left to right.
+/// ## Why this is still leftmost
 ///
-/// The tie-break is therefore scattered — but it is **not random**. It is a
-/// pure function of `(candidates, levelSeed, row)`:
+/// Playtesting asked for the drain to pick a scattered column within a row
+/// instead of sweeping strictly left to right. That was implemented and
+/// measured against the whole shipped campaign with
+/// `tool/reproof_deals.dart`, which re-searches each level's
+/// (shuffleWindow, dealSeed) pair over the same space `tool/gen_levels.dart`
+/// searches — 40 seeds per window, every window down to 1:
 ///
-///  * the live [GameController] and the solvability solver in
-///    `bottle_factory.dart` both call this one function, so the winning line
-///    the solver proves is the winning line the player actually gets;
-///  * it depends only on board state, never on call order, so the two
-///    simulations agree even though they interleave their slots
-///    differently;
-///  * it is stable per level, so replaying a level drains it the same way.
+/// | tie-break                        | levels left unwinnable |
+/// |----------------------------------|------------------------|
+/// | leftmost (shipped)               | 0 / 300                |
+/// | scattered per (level, row)       | 71 / 300               |
+/// | scattered per level              | 77 / 300               |
 ///
-/// Anything that changes here changes every shipped level's solvability
-/// proof, so `test/stall_diagnostic_test.dart` re-proves the campaign
-/// against it.
+/// The failures are not a seed that needs re-rolling: at window 1 the deal
+/// *is* the solver's own witness order, so a level failing there means the
+/// greedy witness cannot beat the board at all under the new rule. The
+/// campaign's 300 proofs are genuinely coupled to this tie-break, and a
+/// quarter of the game would ship unwinnable.
+///
+/// Making the drain scattered therefore requires regenerating the levels
+/// (`dart run tool/gen_levels.dart`), which re-derives art *and* deals
+/// together — not a seed patch. Until that happens the tie-break stays
+/// leftmost, and the scattered *look* is carried by the collect animation
+/// instead, which has no effect on the simulation.
+///
+/// Anything changed here changes every shipped level's solvability proof.
+/// Re-run `COLORO_FULL_SWEEP=1 flutter test test/stall_diagnostic_test.dart`
+/// (or `tool/reproof_deals.dart`) before believing otherwise.
 abstract final class DrainOrder {
   /// Picks one column out of [candidates] — all of which have a matching
-  /// pixel on the same [row], the deepest row still available.
+  /// pixel on the same deepest remaining row.
   ///
-  /// [candidates] must be non-empty and in ascending column order.
-  static int pick(List<int> candidates, int levelSeed, int row) {
-    if (candidates.length == 1) return candidates.first;
-    // EXPERIMENT 2: per-level, row-independent ordering.
-    return candidates[_mix(levelSeed, 0) % candidates.length];
-  }
-
-  /// A cheap integer hash (splitmix-style finalizer). Returns a
-  /// non-negative value so the `%` above is always a valid index.
-  static int _mix(int levelSeed, int row) {
-    var x = (levelSeed * 0x9E3779B1) ^ ((row + 1) * 0x85EBCA6B);
-    x &= 0x3FFFFFFF;
-    x ^= x >> 15;
-    x = (x * 0x2545F491) & 0x3FFFFFFF;
-    x ^= x >> 13;
-    return x & 0x3FFFFFFF;
-  }
+  /// [candidates] is non-empty and in ascending column order.
+  static int pick(List<int> candidates) => candidates.first;
 }

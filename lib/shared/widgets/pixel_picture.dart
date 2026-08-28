@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/display_palette.dart';
 import '../../domain/models/pixel_grid.dart';
 
 /// Renders a finished [PixelGrid] as rounded beads — used for menu previews
@@ -40,7 +41,11 @@ class _PixelPicturePainter extends CustomPainter {
       final c = grid.cells[i];
       if (c == PixelGrid.background) continue;
       final x = i % grid.cols, y = i ~/ grid.cols;
-      paint.color = Color(grid.palette[c]).withValues(alpha: opacity);
+      // Same transform the board uses, so the menu preview and the
+      // level-complete reward are the picture the player just played.
+      paint.color = DisplayPalette.of(
+        grid.palette[c],
+      ).withValues(alpha: opacity);
       final r = Rect.fromLTWH(
         ox + x * cell,
         oy + y * cell,

@@ -11,6 +11,7 @@ import '../../core/haptics/haptics.dart';
 import '../../core/notifications/notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/theme/display_palette.dart';
 import '../../data/bottle_factory.dart';
 import '../../data/level_processor.dart';
 import '../../data/progress_store.dart';
@@ -153,8 +154,10 @@ class GameScreenState extends State<GameScreen>
         _atlas = atlas;
       });
       _ticker.start();
-      AnalyticsService.instance
-          .gameStarted(level: widget.level.number, hard: widget.level.hard);
+      AnalyticsService.instance.gameStarted(
+        level: widget.level.number,
+        hard: widget.level.hard,
+      );
       // Warm both full-screen ads now: the rescue offer must be instant if
       // they lose, and the interstitial must already be in hand by the time
       // they finish — otherwise it slips to the following level.
@@ -187,8 +190,10 @@ class GameScreenState extends State<GameScreen>
     final game = _game;
     if (game == null) return;
 
-    // Hold anywhere → 2× speed (simulation and effects together).
-    final mult = _boosting && game.phase == GamePhase.playing ? 2.0 : 1.0;
+    // Hold anywhere → 3× speed (simulation and effects together). Raised
+    // from 2× alongside the faster base fill rate: the point of the hold is
+    // to skip ahead when the line you picked is obviously working.
+    final mult = _boosting && game.phase == GamePhase.playing ? 3.0 : 1.0;
     game.tick(dt * mult);
     _vfx.update(dt * mult);
     _frame.notify();
@@ -204,14 +209,52 @@ class GameScreenState extends State<GameScreen>
     _vfxWasActive = vfxActive;
   }
 
+  /// Pixel-collect tick. Rate-limited so a fast machine stays pleasant
+  /// rather than becoming a buzzsaw.
+  ///
+  /// The pitch deliberately does NOT track progress any more. It used to
+  /// climb from 0.9 to 1.35 as the picture emptied, and playtesting was
+  /// blunt about it: the sound just kept speeding up and got grating over a
+  /// long level. It now sits at a fixed pitch with a tiny deterministic
+  /// wobble — enough that consecutive ticks aren't machine-identical,
+  /// without ever trending anywhere.
   void _playTickSound(GameController game) {
-    // Rate-limit the pixel tick so bursts stay pleasant, pitch up with combo.
-    if (game.time - _lastTickSoundAt < 0.045) return;
+    if (game.time - _lastTickSoundAt < _tickMinGap) return;
     _lastTickSoundAt = game.time;
-    // Rises gently as the picture empties — a sense of momentum without
-    // any combo bookkeeping.
-    final pitch = 0.9 + game.progress * 0.45;
-    AudioController.instance.play(Sfx.tick, pitch: pitch, volume: 0.5);
+    final wobble = math.sin(game.time * 11.7) * 0.05;
+    AudioController.instance.play(Sfx.tick, pitch: 1.0 + wobble, volume: 0.45);
+    _pulseHaptic(game);
+  }
+
+  /// Shortest gap between two pixel ticks. Raised with the faster fill rate
+  /// so the audio density stayed where it was when the machine sped up.
+  static const _tickMinGap = 0.055;
+
+  /// Continuous haptic texture while the machine drinks — the single most
+  /// asked-for piece of feedback ("more haptics"). Runs at roughly half the
+  /// tick rate so it reads as a purr rather than a rattle, and never fires
+  /// once the level is over.
+  static const _hapticMinGap = 0.11;
+  double _lastHapticAt = -1;
+
+  void _pulseHaptic(GameController game) {
+    if (game.phase != GamePhase.playing) return;
+    if (game.time - _lastHapticAt < _hapticMinGap) return;
+    _lastHapticAt = game.time;
+    Haptics.tick();
+  }
+
+  /// Progress milestones get a heavier, distinct bump — a small "you are
+  /// getting somewhere" beat at each quarter of the picture.
+  static const _milestones = [0.25, 0.5, 0.75];
+  int _milestonesHit = 0;
+
+  void _checkMilestone(GameController game) {
+    if (_milestonesHit >= _milestones.length) return;
+    if (game.progress < _milestones[_milestonesHit]) return;
+    _milestonesHit++;
+    Haptics.medium();
+    AudioController.instance.play(Sfx.pop, pitch: 1.15, volume: 0.5);
   }
 
   // ---------------------------------------------------------------------------
@@ -226,7 +269,7 @@ class GameScreenState extends State<GameScreen>
         if (from != null && to != null) {
           _vfx.launchBottle(
             bottle: bottle,
-            color: Color(_game!.grid.palette[bottle.colorIndex]),
+            color: DisplayPalette.of(_game!.grid.palette[bottle.colorIndex]),
             from: from,
             to: to,
             slotIndex: slotIndex,
@@ -243,11 +286,16 @@ class GameScreenState extends State<GameScreen>
         AudioController.instance.play(Sfx.error);
         Haptics.medium();
 
-      case CellFillStarted(:final cellIndex, :final colorIndex, :final slotIndex):
+      case CellFillStarted(
+        :final cellIndex,
+        :final colorIndex,
+        :final slotIndex,
+      ):
         final game = _game!;
         // The cell is plucked immediately (it dims with a shrink animation)
         // and the bead falls into the docked bottle below.
         game.cellArrived(cellIndex);
+        _checkMilestone(game);
         _canvasActiveUntil = game.time + 0.5;
 
         final canvasBox =
@@ -256,8 +304,11 @@ class GameScreenState extends State<GameScreen>
             _stackKey.currentContext?.findRenderObject() as RenderBox?;
         final to = _centerOf(_slotKeys[slotIndex]);
         if (to == null || canvasBox == null || stackBox == null) return;
-        final local =
-            PixelCanvas.cellCenter(canvasBox.size, game.grid, cellIndex);
+        final local = PixelCanvas.cellCenter(
+          canvasBox.size,
+          game.grid,
+          cellIndex,
+        );
         final from = stackBox.globalToLocal(canvasBox.localToGlobal(local));
         // Gentle sideways arc on the way down.
         final mid = Offset.lerp(from, to, 0.5)!;
@@ -266,17 +317,19 @@ class GameScreenState extends State<GameScreen>
           from: from,
           to: to,
           control: control,
-          color: Color(game.grid.palette[colorIndex]),
+          color: DisplayPalette.of(game.grid.palette[colorIndex]),
           cellIndex: cellIndex,
           size: math.max(
-              6, PixelCanvas.cellSize(canvasBox.size, game.grid) * 0.8),
+            6,
+            PixelCanvas.cellSize(canvasBox.size, game.grid) * 0.8,
+          ),
           follow: () => _liveBottlePoint(slotIndex),
         );
 
       case BottleEmptied(:final slotIndex, :final colorIndex):
         final at = _centerOf(_slotKeys[slotIndex]);
         if (at != null) {
-          final color = Color(_game!.grid.palette[colorIndex]);
+          final color = DisplayPalette.of(_game!.grid.palette[colorIndex]);
           _vfx.burst(at, color);
           _vfx.ring(at, color);
         }
@@ -288,7 +341,9 @@ class GameScreenState extends State<GameScreen>
         if (stuck) {
           // Soft warning clunk — the bottle's color isn't on the edge.
           AudioController.instance.play(Sfx.error, pitch: 1.4, volume: 0.45);
-          Haptics.light();
+          // Promoted from light: a bottle going hungry is the warning the
+          // whole fail state builds from, so it should be felt, not guessed.
+          Haptics.medium();
           _vfx.shake(1.5);
         }
 
@@ -402,18 +457,37 @@ class GameScreenState extends State<GameScreen>
   /// Between-levels interstitial (from level 3 on), then move along. The
   /// ad is skipped silently whenever one is not ready.
   Future<void> _goToNextLevel() async {
-    if (AdService.instance.supported) {
-      final shown = await AdService.instance
-          .maybeShowInterstitial(completedLevel: widget.level.number);
-      if (shown) {
-        AnalyticsService.instance.adShown(
-          format: 'interstitial',
-          level: widget.level.number,
-        );
-      }
-    }
+    await _showExitInterstitial('interstitial');
     if (!mounted) return;
     Navigator.of(context).pop(GameExit.playNext);
+  }
+
+  /// Retry after a machine jam.
+  ///
+  /// Losing and retrying is the single most travelled transition in the
+  /// game, and it was the only exit from a level that never showed an ad —
+  /// reported as a bug, and it is also the biggest single piece of unserved
+  /// inventory in the app. It runs through exactly the same gate as the
+  /// between-levels ad (level >= 4, at least 30s since the last one), so
+  /// onboarding stays clean and a retry streak can't turn into a wall of
+  /// full-screen ads.
+  Future<void> _retryLevel() async {
+    await _showExitInterstitial('interstitial_retry');
+    if (!mounted) return;
+    Navigator.of(context).pop(GameExit.replay);
+  }
+
+  Future<void> _showExitInterstitial(String format) async {
+    if (!AdService.instance.supported) return;
+    final shown = await AdService.instance.maybeShowInterstitial(
+      level: widget.level.number,
+    );
+    if (shown) {
+      AnalyticsService.instance.adShown(
+        format: format,
+        level: widget.level.number,
+      );
+    }
   }
 
   /// Rewarded-ad rescue after a jam: watch an ad, get a 5th slot, and carry
@@ -612,15 +686,15 @@ class GameScreenState extends State<GameScreen>
           if (_machineJammed)
             Positioned.fill(
               child: LevelFailedOverlay(
-                onRetry: () => Navigator.of(context).pop(GameExit.replay),
+                onRetry: _retryLevel,
                 onMenu: () => Navigator.of(context).pop(GameExit.toMenu),
                 // Repeatable: every jam can be bought off with another slot
                 // until the machine reaches its ceiling, after which the
                 // level has to be replayed.
                 onWatchAd:
                     AdService.instance.isRewardedReady && game.canEarnExtraSlot
-                        ? _watchAdForExtraSlot
-                        : null,
+                    ? _watchAdForExtraSlot
+                    : null,
                 slotsNow: game.activeSlotCount,
                 slotsMax: GameController.maxSlots,
               ),
@@ -666,7 +740,7 @@ class GameScreenState extends State<GameScreen>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'x2',
+                        'x3',
                         style: AppTypography.style(
                           size: 15,
                           weight: 700,

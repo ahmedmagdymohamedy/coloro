@@ -121,5 +121,5 @@ bool _solvable(PixelGrid grid, int n, int window, int dealSeed) {
   if (deal.fold<int>(0, (a, b) => a + b.capacity) != grid.fillableCount) {
     return false;
   }
-  return BottleFactory.isDealSolvable(grid, deal, seed: n, maxNodes: _maxNodes);
+  return BottleFactory.isDealSolvable(grid, deal, maxNodes: _maxNodes);
 }

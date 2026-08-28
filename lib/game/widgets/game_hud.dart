@@ -34,9 +34,25 @@ class GameHud extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${level.number}. ${level.displayName}',
-                  style: AppTypography.style(size: 17, weight: 650),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        '${level.number}. ${level.displayName}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.style(size: 17, weight: 650),
+                      ),
+                    ),
+                    // Every 5th level is a hard one. The menu card already
+                    // flags it, but by the time the board is on screen that
+                    // card is gone — and "this one is genuinely harder" is
+                    // exactly the context a player wants while losing it.
+                    if (level.hard) ...[
+                      const SizedBox(width: 8),
+                      const _HardBadge(),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 5),
                 ValueListenableBuilder<double>(
@@ -60,6 +76,24 @@ class GameHud extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// The in-game "this level is meant to be hard" flag.
+class _HardBadge extends StatelessWidget {
+  const _HardBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8495F),
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: Colors.white38, width: 1),
+      ),
+      child: Text('HARD', style: AppTypography.style(size: 10, weight: 700)),
     );
   }
 }
@@ -109,9 +143,7 @@ class _RoundButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.panel,
-      shape: const CircleBorder(
-        side: BorderSide(color: Color(0x22FFFFFF)),
-      ),
+      shape: const CircleBorder(side: BorderSide(color: Color(0x22FFFFFF))),
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,

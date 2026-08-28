@@ -26,7 +26,7 @@ abstract final class BottleFactory {
     int shuffleWindow = 1,
     int dealSeed = 0,
   }) {
-    final base = _baseOrder(grid, _chunk(grid, seed), seed);
+    final base = _baseOrder(grid, _chunk(grid, seed));
     if (shuffleWindow <= 1) return base;
     return _windowShuffle(base, shuffleWindow, math.Random(dealSeed));
   }
@@ -34,16 +34,11 @@ abstract final class BottleFactory {
   /// True when a winning line of play exists for this exact deal, under the
   /// real constraints: only the 4 column fronts are reachable, 5 slots, a
   /// docked bottle occupies its slot until it drinks its full capacity.
-  ///
-  /// [seed] must be the same level seed the runtime [GameController] runs
-  /// with — it selects the drain order, so a proof under a different seed
-  /// would describe a different game.
   static bool isDealSolvable(
     PixelGrid grid,
     List<PaintBottle> deal, {
-    int seed = 0,
     int maxNodes = 120000,
-  }) => _Solver(grid, deal, seed).solve(maxNodes);
+  }) => _Solver(grid, deal).solve(maxNodes);
 
   // ---------------------------------------------------------------------------
   // Supply
@@ -89,9 +84,8 @@ abstract final class BottleFactory {
   static List<PaintBottle> _baseOrder(
     PixelGrid grid,
     List<PaintBottle> bottles,
-    int seed,
   ) {
-    return _Solver(grid, bottles, seed).witnessOrder() ?? bottles;
+    return _Solver(grid, bottles).witnessOrder() ?? bottles;
   }
 
   /// Permutes the order within sliding windows of [window] bottles, so a
@@ -117,7 +111,7 @@ abstract final class BottleFactory {
 /// (the drain is strictly bottom-up per column), which makes states small
 /// enough to memoize.
 class _Solver {
-  _Solver(this.grid, this.deal, this.seed)
+  _Solver(this.grid, this.deal)
     : cols = grid.cols,
       rows = grid.rows,
       drunk = List<int>.filled(grid.cols, 0),
@@ -133,9 +127,6 @@ class _Solver {
 
   final PixelGrid grid;
   final List<PaintBottle> deal;
-
-  /// Level seed — feeds [DrainOrder] exactly as the runtime does.
-  final int seed;
   final int cols, rows;
 
   late final List<List<PaintBottle>> tray;
@@ -167,7 +158,7 @@ class _Solver {
       for (var x = 0; x < cols; x++)
         if (_colorAtBottom(x) == color && drunk[x] == bestDrunk) x,
     ];
-    return DrainOrder.pick(candidates, seed, rows - 1 - bestDrunk);
+    return DrainOrder.pick(candidates);
   }
 
   int _takableFor(int color) {

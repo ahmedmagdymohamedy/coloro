@@ -60,7 +60,7 @@ void main() {
         reason: 'the supply must cover the picture exactly',
       );
       expect(
-        BottleFactory.isDealSolvable(l.grid, l.deal, seed: n),
+        BottleFactory.isDealSolvable(l.grid, l.deal),
         isTrue,
         reason: 'the shipped deal for level $n has no winning line',
       );

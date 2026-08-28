@@ -42,11 +42,10 @@ class SlotBottle {
 ///
 /// The full-square picture starts complete. Docked bottles continuously
 /// drink pixels from the picture's BOTTOM EDGE only: for each column, just
-/// the lowest remaining pixel is reachable. A bottle takes matching
-/// bottom-edge pixels (random column among matches, sometimes grabbing the
-/// next pixel of the same column too), so the picture drains downward,
-/// column by column, and a color buried above other colors cannot be
-/// reached until they're drunk first.
+/// the lowest remaining pixel is reachable. A bottle always takes the
+/// deepest matching pixel available, breaking ties by [DrainOrder], so the
+/// picture drains row by row from the bottom up and a color buried above
+/// other colors cannot be reached until they're drunk first.
 ///
 /// A docked bottle whose color shows nowhere on the bottom edge STARVES
 /// (red "!"). When every slot holds a starving bottle for a moment, the
@@ -62,7 +61,9 @@ class GameController extends ChangeNotifier {
     this.slotCount = 4,
     this.columnCount = 4,
     this.fillRate = 7.0,
-    this.seed = 0,
+    // Kept for call-site stability; the drain order is fully deterministic.
+    // ignore: avoid_unused_constructor_parameters
+    int seed = 0,
   }) {
     // Deal bottles round-robin into tray columns.
     tray = List.generate(columnCount, (_) => <PaintBottle>[]);
@@ -77,10 +78,6 @@ class GameController extends ChangeNotifier {
   final PixelGrid grid;
   final int slotCount;
   final int columnCount;
-
-  /// The level number. Seeds [DrainOrder], so a level always drains in the
-  /// same scattered order — and in the same order the solver proved.
-  final int seed;
 
   /// Pixels per second a docked bottle drinks while matches exist.
   final double fillRate;
@@ -257,7 +254,7 @@ class GameController extends ChangeNotifier {
         for (final m in matches)
           if (m.row == deepest) m.column,
       ];
-      final column = DrainOrder.pick(candidates, seed, deepest);
+      final column = DrainOrder.pick(candidates);
       final pick = matches.indexWhere((m) => m.column == column);
 
       // Exactly ONE pixel per take: the column's bottom cell.
