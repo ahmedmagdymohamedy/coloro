@@ -1,6 +1,6 @@
 # Coloro — engineering handoff
 
-**Last updated:** 1 Sep 2026.
+**Last updated:** 1 Sep 2026 (evening — after the Play data-safety rejection).
 Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
 ---
@@ -9,7 +9,7 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
 | | |
 |---|---|
-| **Google Play** | **LIVE.** Production = 1.0.7 (code 7); **1.0.8 (code 8) uploaded to production 1 Sep, in Google's update review** — adds Unity Ads mediation. Listing art = 1.0.7 palette. **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
+| **Google Play** | **LIVE.** Production = 1.0.7 (code 7). **1.0.8 (code 8) was REJECTED** for an invalid Data safety form, **fixed and re-sent for review 1 Sep** — see "The data-safety rejection" below. Listing art = 1.0.7 palette. **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
 | **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
 | **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
 | **Git** | ✅ Clean and pushed. `39cc662` = 1.0.7 as shipped; `29f95a1` = 1.0.8 mediation. |
@@ -24,21 +24,70 @@ piece after a 303/303 full sweep, and `29f95a1` added the 1.0.8 mediation
 change. The `lib/` + `assets/levels/levels.json` matched-pair rule still
 applies to any future palette/quantizer work.
 
+## ⚠ The data-safety rejection (1 Sep) — fixed, but read this before adding an SDK
+
+Google rejected **version code 8** with *Invalid Data safety form*: it
+detected user data leaving the device — "Device or other IDs", attributed to
+`com.applovin:applovin-sdk` — that the form did not declare.
+
+**Root cause: the form declared that the app collects _nothing at all_.**
+Question 1 of the Data safety questionnaire ("does your app collect or share
+any of the required user data types?") was answered **No**, and had been
+since launch. That was already wrong for 1.0.7 — AdMob and Firebase both
+transmit identifiers — and the AppLovin adapter in 1.0.8 is simply what made
+Google's scanner notice.
+
+**Fix (console only — no code change, no new version code).** The form was
+completed from the SDKs' own published Play disclosures, taking the union of
+Google Mobile Ads, Unity Ads, AppLovin, Firebase and Meta. All four types are
+**collected _and_ shared**, none processed ephemerally, all required (no
+in-app opt-out), and encryption in transit = yes:
+
+| Data type | Purposes declared |
+|---|---|
+| Location → Approximate location | Advertising, Analytics, Fraud prevention |
+| App activity → App interactions | Advertising, Analytics, Fraud prevention |
+| App info and performance → Diagnostics | + App functionality |
+| **Device or other IDs** (the flagged one) | + App functionality |
+
+Also answered: no account creation, no external sign-in, no data-deletion
+request mechanism.
+
+**Rules this leaves behind:**
+
+- **Adding any SDK means re-opening this form.** The scanner re-runs on every
+  release and compares traffic against the declaration.
+- **`aso/privacy_policy.md` must stay in step with the form** — Play policy
+  requires the two to agree. It was rewritten the same day to name Unity Ads,
+  AppLovin and Meta and to spell out the identifier/location collection.
+- **The hosted policy is NOT this file.** Play points at
+  `https://sites.google.com/view/ammegz`, a generic Megz-wide policy that
+  names AdMob, Flurry, Google Analytics and Facebook Login and never mentions
+  advertising IDs. **Ahmed's task:** paste `aso/privacy_policy.md` into that
+  Google Site (or host it separately and swap the URL). This is the remaining
+  inconsistency a human reviewer could still act on.
+
 ## ▶ Where to resume (next session, in value order)
 
-1. **AppLovin SDK key** (Ahmed was locked out of max.applovin.com; reset
+1. **Watch the 1.0.8 re-review** (sent 1 Sep, ≤7 days). Play Console →
+   Publishing overview should show "changes under review", and *Policy
+   status* → the data-safety issue should clear itself once Google sees the
+   corrected form. If it is rejected again, the next suspect is the hosted
+   privacy policy above, not the form.
+2. **AppLovin SDK key** (Ahmed was locked out of max.applovin.com; reset
    pending). When available: `applovin.sdk.key` meta-data in
    `AndroidManifest.xml` + AppLovin as a *waterfall* source in the three
    mediation groups (it does not bid on AdMob) → ship as 1.0.9.
-2. **Check the reviews**: Play 1.0.8 rollout; Apple 1.0.7 (auto-releases).
+3. **Check the reviews**: Play 1.0.8 rollout; Apple 1.0.7 (auto-releases).
    When iOS is live: declare the iOS platform in the Meta app
    (`marketing/docs/facebook-app-events.md` §1b) and plan iOS mediation
    behind a real ATT flow.
-3. **13 Sep**: the Google Ads flight completes — read against
+4. **13 Sep**: the Google Ads flight completes — read against
    `marketing/MARKETING_PLAN.md` §2.5 kill criteria. Until then: hands off.
-4. **~8 Sep**: compare mediation vs the baseline table in
+5. **~8 Sep**: compare mediation vs the baseline table in
    `chat_history/2026-09-01-mediation-and-releases-session.md` §5.
-5. Ahmed's own list: Unity payout profile; revoke the 3 unknown "Windows"
+6. Ahmed's own list: **host the Coloro privacy policy** (above); Unity payout
+   profile; revoke the 3 unknown "Windows"
    browsers in the Claude extension; 5 remaining house-ad sizes (any
    session can click those through).
 

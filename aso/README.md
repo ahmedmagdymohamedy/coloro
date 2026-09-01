@@ -63,7 +63,10 @@ folder:
 ## Launch checklist
 
 - [ ] Host `privacy_policy.md`, paste URL in Play + App Store
-- [ ] Play: Data safety form (Device IDs, ads + analytics)
+- [ ] Play: Data safety form — **answer "yes" to question 1**; declare
+      approximate location, app interactions, diagnostics and device or other
+      IDs, all collected **and shared**. Answering "no data collected" got
+      code 8 rejected on 1 Sep 2026; see HANDOFF.md.
 - [ ] Play: "Contains ads" declared
 - [ ] Play: content rating questionnaire (Everyone / PEGI 3)
 - [ ] App Store: work through `listing_app_store.md` — the ATT/IDFA
