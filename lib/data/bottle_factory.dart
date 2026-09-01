@@ -26,7 +26,7 @@ abstract final class BottleFactory {
     int shuffleWindow = 1,
     int dealSeed = 0,
   }) {
-    final base = _baseOrder(grid, _chunk(grid, seed));
+    final base = _baseOrder(grid, _chunk(grid, seed), seed);
     if (shuffleWindow <= 1) return base;
     return _windowShuffle(base, shuffleWindow, math.Random(dealSeed));
   }
@@ -40,6 +40,17 @@ abstract final class BottleFactory {
     int maxNodes = 120000,
   }) => _Solver(grid, deal).solve(maxNodes);
 
+  /// The dock order of a proven winning line for [deal], or null when the
+  /// search exhausts [maxNodes]. Returns the same [PaintBottle] instances
+  /// as [deal], so callers can match by [PaintBottle.id]. Exists for the
+  /// promo-video generator, which has to replay a legal winning game on
+  /// camera; gameplay never calls it.
+  static List<PaintBottle>? solveDealOrder(
+    PixelGrid grid,
+    List<PaintBottle> deal, {
+    int maxNodes = 800000,
+  }) => _Solver(grid, deal).winningOrder(maxNodes);
+
   // ---------------------------------------------------------------------------
   // Supply
   // ---------------------------------------------------------------------------
@@ -51,10 +62,12 @@ abstract final class BottleFactory {
     for (var color = 0; color < grid.palette.length; color++) {
       final total = grid.colorCounts[color];
       // A bottle holds its slot until it fills up, so a big bottle for a
-      // thinly-spread color is a slot hostage. Cap capacity relative to
-      // how much of that color exists: rarer color → smaller bottles →
-      // faster turnover → the machine keeps breathing.
-      final maxChunk = math.max(6, math.min(40, (total / 3).round()));
+      // thinly-spread colour is a slot hostage. The cap came down from 40
+      // when the fixed palette landed: merging near-identical colours makes
+      // each surviving colour's cell count larger, which under the old
+      // formula produced 40-capacity bottles that sat in a slot starving.
+      // Smaller bottles turn over faster and keep the machine breathing.
+      final maxChunk = math.max(6, math.min(20, (total / 4).round()));
       var remaining = total;
       while (remaining > 0) {
         final int capacity;
@@ -81,11 +94,36 @@ abstract final class BottleFactory {
 
   /// A known-feasible baseline order: the dock order of a slot-constrained
   /// greedy solve (see [_Solver.witnessOrder]). Shuffling perturbs THIS.
+  /// Memoised because the baseline depends only on the board and the
+  /// chunking seed — never on `shuffleWindow` or `dealSeed`. The level
+  /// generator and `tool/reproof_deals.dart` both call [build] dozens of
+  /// times per level while searching for a deal, and without this the
+  /// (occasionally expensive) solver fallback below would be redone on
+  /// every one of those attempts.
+  ///
+  /// Keyed by the grid *object* via an [Expando] rather than by a hash of
+  /// its contents. A content hash can collide, and a collision here would
+  /// silently hand back a base order computed for a different board — a
+  /// deal that does not match the level being played. An Expando cannot
+  /// collide and needs no eviction: entries die with the grid.
+  static final Expando<Map<int, List<PaintBottle>>> _baseCache = Expando();
+
   static List<PaintBottle> _baseOrder(
     PixelGrid grid,
     List<PaintBottle> bottles,
+    int seed,
   ) {
-    return _Solver(grid, bottles).witnessOrder() ?? bottles;
+    final perGrid = _baseCache[grid] ??= <int, List<PaintBottle>>{};
+    final cached = perGrid[seed];
+    if (cached != null) return cached;
+
+    // Greedy is cheap and succeeds on most boards.
+    var order = _Solver(grid, bottles).witnessOrder();
+    // It failed, so search for a real winning line rather than falling back
+    // to the colour-sorted deal, which is almost never winnable.
+    order ??= _Solver(grid, bottles).winningOrder();
+
+    return perGrid[seed] = order ?? bottles;
   }
 
   /// Permutes the order within sliding windows of [window] bottles, so a
@@ -277,7 +315,7 @@ class _Solver {
         final bottle = tray[c][colPtr[c]];
         slots[slotIndex] = _Docked(bottle.colorIndex, bottle.capacity);
         colPtr[c]++;
-        journal.add(_Step.dock(slotIndex, c));
+        journal.add(_Step.dock(slotIndex, c, bottle));
         if (_search(maxNodes, journal)) return true;
         _undo(journal, journal.length - 1);
       }
@@ -291,6 +329,26 @@ class _Solver {
 
     _undo(journal, mark);
     return false;
+  }
+
+  /// The dock order of a full backtracking solve.
+  ///
+  /// [witnessOrder] is greedy and gives up the moment its heuristic picks
+  /// wrong, which on some boards happens even though a winning line plainly
+  /// exists. Falling back from a failed greedy straight to the raw
+  /// colour-sorted deal produced levels nothing could beat; this searches
+  /// properly and hands back a line that provably wins.
+  List<PaintBottle>? winningOrder([int maxNodes = 200000]) {
+    _nodes = 0;
+    final journal = <_Step>[];
+    if (!_search(maxNodes, journal)) return null;
+    final order = <PaintBottle>[
+      for (final st in journal)
+        if (st.kind == _StepKind.dock && st.bottle != null) st.bottle!,
+    ];
+    final seen = {for (final b in order) b.id};
+    order.addAll(deal.where((b) => !seen.contains(b.id)));
+    return order.length == deal.length ? order : null;
   }
 
   /// Greedy (no backtracking) solve that records the dock order — used as
@@ -352,14 +410,24 @@ enum _StepKind { drink, pop, dock }
 class _Step {
   _Step.drink(this.slot, this.column)
     : kind = _StepKind.drink,
+      poppedColor = -1,
+      bottle = null;
+  _Step.pop(this.slot, this.poppedColor)
+    : kind = _StepKind.pop,
+      column = -1,
+      bottle = null;
+  _Step.dock(this.slot, this.column, [this.bottle])
+    : kind = _StepKind.dock,
       poppedColor = -1;
-  _Step.pop(this.slot, this.poppedColor) : kind = _StepKind.pop, column = -1;
-  _Step.dock(this.slot, this.column) : kind = _StepKind.dock, poppedColor = -1;
 
   final _StepKind kind;
   final int slot;
   final int column;
   final int poppedColor;
+
+  /// Only set on dock steps — lets [_Solver.winningOrder] read the dock
+  /// sequence straight back out of a successful search.
+  final PaintBottle? bottle;
 }
 
 class _Docked {

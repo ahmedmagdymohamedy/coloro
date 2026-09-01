@@ -17,19 +17,21 @@
 /* ===========================================================================
    Coloro — self-contained playable ad.
 
-   One file, zero network requests: no fonts, no images, no scripts, no CSS
-   from anywhere else. Everything is drawn on a canvas at runtime. That is a
-   hard requirement for Google Ads HTML5 playables and for most ad networks,
-   and it also means this file works offline, from a file:// URL, and inside
-   an <iframe> on a landing page.
+   One file, zero network requests: no fonts, no images, no audio files, no
+   scripts, no CSS from anywhere else. Everything is drawn on a canvas and
+   every sound is synthesised with WebAudio at runtime. That is a hard
+   requirement for Google Ads HTML5 playables and for most ad networks, and
+   it also means this works offline, from a file:// URL, or in an <iframe>.
 
-   The mechanic is the real game's: bottles drink the picture from its
-   BOTTOM EDGE only, so a colour buried under others cannot be reached yet.
-   The one deliberate difference is that this build cannot be lost — tapping
-   a docked bottle sends it back to the tray. A playable ad that dead-ends
-   is a wasted impression.
+   It is built to mirror the real app: the same fixed 12-colour palette, the
+   same machine frame, slot holders, flask shapes and tray, and the same
+   mechanic — bottles drink the picture from its BOTTOM EDGE only.
 
-   Hooks for the network are at the very bottom (CTA_URL, mraid/FbPlayableAd).
+   Two deliberate differences from the game:
+     * it cannot be lost (tap a docked bottle to send it back), because an
+       ad that dead-ends is a wasted impression;
+     * a hand pointer demonstrates the first tap, because a player who does
+       not understand the mechanic in three seconds closes the ad.
    =========================================================================== */
 
 (function () {
@@ -39,24 +41,55 @@
   var ctx = cvs.getContext('2d');
   var W = 0, H = 0, DPR = 1;
 
-  // ---------------------------------------------------------------- palette
-  // Bright, high-lightness colours — the same readability rule the app uses:
-  // a pixel and the bottle that drinks it must be obviously the same colour.
-  var PALETTE = ['#FFD43B', '#3BC9DB', '#FF5CA8', '#51CF66', '#9775FA'];
-  var BG_TOP = '#2E2250', BG_BOT = '#171030';
-  var PANEL = '#241B44', PANEL_DEEP = '#150F2C';
+  // ------------------------------------------------------- palette + chrome
+  // The same fixed twelve the app ships (lib/data/game_palette.dart). Each
+  // owns its own 30-degree hue slot, so no two ever read as one colour.
+  var PALETTE = ['#D61F1F','#E27A12','#E2E212','#7ABE37','#12E212','#A2EBC7',
+                 '#1FD6D6','#127AE2','#8989E6','#7A2BCA','#ED26ED','#F797C7'];
+  // Indices this creative uses, in the app's own arcade spirit.
+  var USE = { sky:6, sand:2, heart:10, shade:9, accent:4 };
+
+  var BG_TOP='#2E2250', BG_BOT='#171030', PANEL='#241B44', PANEL_DEEP='#150F2C',
+      FRAME='#4A3E78', FRAME_LIGHT='#6C5DA8', TEXT='#FFFFFF', TEXT_SOFT='#B9AEE0',
+      SOCKET='#080614', CTA_TOP='#FFB13D', CTA_BOT='#FF7A1A';
+
+  // ------------------------------------------------------------------ audio
+  // Synthesised, so the file stays request-free. Browsers only allow audio
+  // after a gesture, so the context is created lazily on the first tap.
+  var AC = null, muted = false;
+  function ac() {
+    if (AC === null) {
+      try { AC = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) { AC = false; }
+    }
+    if (AC && AC.state === 'suspended') { try { AC.resume(); } catch (e) {} }
+    return AC || null;
+  }
+  function tone(freq, dur, type, vol, slideTo) {
+    if (muted) return;
+    var a = ac(); if (!a) return;
+    try {
+      var o = a.createOscillator(), g = a.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, a.currentTime);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, a.currentTime + dur);
+      g.gain.setValueAtTime(vol || 0.06, a.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0008, a.currentTime + dur);
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(a.currentTime + dur);
+    } catch (e) {}
+  }
+  var lastTick = 0;
+  function sfxTick(t) { if (t - lastTick < 0.05) return; lastTick = t; tone(660, 0.07, 'triangle', 0.05); }
+  function sfxDock()  { tone(300, 0.16, 'sine', 0.07, 620); }
+  function sfxPop()   { tone(520, 0.22, 'square', 0.05, 190); }
+  function sfxWin()   { [523,659,784,1047].forEach(function (f, i) { setTimeout(function () { tone(f, 0.32, 'triangle', 0.07); }, i * 110); }); }
 
   // ------------------------------------------------------------------ level
   var COLS = 12, ROWS = 12;
-  var cells = [];      // colour index per cell
-  var taken = [];      // collected?
-  var takenAt = [];    // time collected, for the pop animation
+  var cells = [], taken = [], takenAt = [];
 
-  // A hand-authored sprite reads far better at 12x12 than any formula, and
-  // it guarantees a well-formed grid: 12 rows of exactly 12 characters.
   //   .  sky   #  sand   X  heart   x  heart shadow   *  accent
-  // The shadow is a rim down the heart's right edge, not half the shape —
-  // a 50/50 split reads as two blobs rather than one object.
   var ART = [
     '...*........',
     '..XX....XX..',
@@ -77,19 +110,12 @@
     for (var y = 0; y < ROWS; y++) {
       var row = ART[y];
       for (var x = 0; x < COLS; x++) {
-        var ch = row.charAt(x), v;
-        if (ch === 'X') {
-          v = 2;
-        } else if (ch === 'x') {
-          v = 4;
-        } else if (ch === '#') {
-          v = 0;
-        } else if (ch === '*') {
-          v = 3;
-        } else {
-          v = 1;
-        }
-        cells[y * COLS + x] = v;
+        var ch = row.charAt(x);
+        cells[y * COLS + x] =
+          ch === 'X' ? USE.heart :
+          ch === 'x' ? USE.shade :
+          ch === '#' ? USE.sand  :
+          ch === '*' ? USE.accent : USE.sky;
       }
     }
     taken = new Array(COLS * ROWS).fill(false);
@@ -97,39 +123,29 @@
   }
 
   // ----------------------------------------------------------------- supply
-  var tray = [], slots = [null, null, null, null];
-  var SLOTS = 4;
+  var tray = [], slots = [null, null, null, null], SLOTS = 4;
 
   function buildBottles() {
     var counts = {};
     for (var i = 0; i < cells.length; i++) counts[cells[i]] = (counts[cells[i]] || 0) + 1;
-
-    var list = [];
-    var id = 0;
+    var list = [], id = 0;
     for (var c in counts) {
       var left = counts[c];
       while (left > 0) {
-        // Small bottles keep slots turning over, which keeps the ad moving.
         var cap = Math.min(left, left <= 9 ? left : (6 + (id % 3) * 2));
         list.push({ id: id++, color: +c, cap: cap, left: cap });
         left -= cap;
       }
     }
-    // Interleave colours so the first taps have an obvious right answer but
-    // the queue still looks varied.
     list.sort(function (a, b) { return (a.id % 5) - (b.id % 5) || a.color - b.color; });
     tray = list;
   }
 
   // ------------------------------------------------------------------ rules
   function bottomCellOf(x) {
-    for (var y = ROWS - 1; y >= 0; y--) {
-      var i = y * COLS + x;
-      if (!taken[i]) return i;
-    }
+    for (var y = ROWS - 1; y >= 0; y--) { var i = y * COLS + x; if (!taken[i]) return i; }
     return -1;
   }
-
   function matchesFor(color) {
     var out = [];
     for (var x = 0; x < COLS; x++) {
@@ -138,26 +154,21 @@
     }
     return out;
   }
-
   var remaining = 0;
-  function countRemaining() {
-    var n = 0;
-    for (var i = 0; i < taken.length; i++) if (!taken[i]) n++;
-    return n;
-  }
+  function countRemaining() { var n = 0; for (var i = 0; i < taken.length; i++) if (!taken[i]) n++; return n; }
 
   // ------------------------------------------------------------------ state
-  var t = 0, lastFrame = 0, won = false, wonAt = 0;
-  var FILL_RATE = 9;          // pixels/sec per docked bottle
-  var flights = [], sparks = [];
+  var t = 0, lastFrame = 0, won = false, wonAt = 0, total = 0;
+  var FILL_RATE = 9, flights = [], sparks = [];
+  var tutorial = true, handT = 0, everDocked = false;
 
   function reset() {
-    buildPicture();
-    buildBottles();
+    buildPicture(); buildBottles();
     slots = [null, null, null, null];
     flights = []; sparks = [];
     won = false; wonAt = 0; t = 0;
-    remaining = countRemaining();
+    tutorial = true; everDocked = false; handT = 0;
+    remaining = countRemaining(); total = remaining;
   }
 
   // ----------------------------------------------------------------- layout
@@ -169,27 +180,25 @@
     cvs.style.width = W + 'px'; cvs.style.height = H + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-    // Ads always render in a portrait frame. Capping the play column keeps
-    // the composition identical in a desktop preview or a landing-page
-    // embed instead of stretching the tray across a 1500px window.
     var PW = Math.min(W, 480);
-    L.ox = (W - PW) / 2;
-    L.pw = PW;
+    L.ox = (W - PW) / 2; L.pw = PW;
     var pad = Math.max(10, PW * 0.04);
-    var trayH = Math.min(H * 0.20, 150);
-    var slotH = Math.min(H * 0.11, 86);
-    var headerH = Math.min(H * 0.15, 120);
+    var ctaH = Math.min(58, H * 0.085);
+    var hudH = Math.min(H * 0.085, 66);
+    var trayH = Math.min(H * 0.19, 146);
+    var slotH = Math.min(H * 0.105, 82);
 
-    // Ads render portrait; cap the board so a wide desktop preview still
-    // shows the real composition instead of a stretched one.
-    var boardMax = Math.min(PW - pad * 2, H - headerH - slotH - trayH - pad * 2);
-    L.board = { x: L.ox + (PW - boardMax) / 2, y: headerH, size: boardMax };
+    var boardMax = Math.min(PW - pad * 2, H - hudH - slotH - trayH - ctaH - pad * 2.4);
+    L.board = { x: L.ox + (PW - boardMax) / 2, y: hudH + pad * 0.5, size: boardMax };
     L.cell = boardMax / COLS;
-    L.slotY = L.board.y + boardMax + pad * 0.6;
+    L.slotY = L.board.y + boardMax + pad * 0.8;
     L.slotH = slotH;
-    L.trayY = H - trayH;
+    L.trayY = H - ctaH - trayH;
     L.trayH = trayH;
+    L.ctaY = H - ctaH;
+    L.ctaH = ctaH;
     L.pad = pad;
+    L.hudH = hudH;
   }
 
   // ---------------------------------------------------------------- drawing
@@ -201,7 +210,6 @@
     b = Math.max(0, Math.min(255, Math.round(b + 255 * amt)));
     return 'rgb(' + r + ',' + g + ',' + b + ')';
   }
-
   function roundRect(x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -212,8 +220,6 @@
     ctx.closePath();
   }
 
-  // A filled pixel: chunky, lit from the top-left, with a gap around it so a
-  // run of one colour still reads as separate pixels.
   function drawBead(cx, cy, size, color, scale) {
     var s = size * 0.76 * (scale === undefined ? 1 : scale);
     if (s <= 0.5) return;
@@ -233,11 +239,9 @@
     roundRect(x + s * 0.03, y + s * 0.03, s * 0.94, s * 0.94, r); ctx.stroke();
   }
 
-  // An emptied cell: a colourless hole. Never tinted — a tinted socket is
-  // exactly what makes a dark board unreadable.
   function drawSocket(cx, cy, size) {
     var s = size * 0.48;
-    ctx.fillStyle = '#080614';
+    ctx.fillStyle = SOCKET;
     roundRect(cx - s / 2, cy - s / 2, s, s, s * 0.24); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 1;
@@ -245,26 +249,16 @@
   }
 
   function drawFlask(cx, baseY, w, h, color, label, fill, alarm) {
-    // Every part is sized off the body radius so the flask keeps its shape
-    // whatever box it is handed — sizing the neck off `h` made it a floating
-    // ribbon in short boxes.
     var r = Math.min(w * 0.5, h * 0.38);
     var cy = baseY - r;
     var glass = shade(color, -0.10);
-
-    // Neck, then collar, then cork — all drawn before the body so the body
-    // covers where they meet it.
     ctx.fillStyle = glass;
     ctx.fillRect(cx - r * 0.28, cy - r * 1.55, r * 0.56, r * 0.75);
-    roundRect(cx - r * 0.42, cy - r * 1.68, r * 0.84, r * 0.26, r * 0.10);
-    ctx.fill();
+    roundRect(cx - r * 0.42, cy - r * 1.68, r * 0.84, r * 0.26, r * 0.10); ctx.fill();
     ctx.fillStyle = shade(color, 0.08);
-    roundRect(cx - r * 0.30, cy - r * 2.02, r * 0.60, r * 0.40, r * 0.14);
-    ctx.fill();
-
+    roundRect(cx - r * 0.30, cy - r * 2.02, r * 0.60, r * 0.40, r * 0.14); ctx.fill();
     ctx.fillStyle = glass;
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.fill();
-
     var inner = r * 0.88;
     var lvl = Math.max(0, Math.min(1, fill)) * 2 * inner;
     if (lvl > 0.5) {
@@ -274,11 +268,9 @@
       ctx.fillRect(cx - inner, cy + inner - lvl, inner * 2, lvl);
       ctx.restore();
     }
-
     ctx.strokeStyle = shade(color, 0.22);
     ctx.lineWidth = Math.max(1.4, r * 0.13);
     ctx.beginPath(); ctx.arc(cx, cy, r - ctx.lineWidth / 2, 0, 6.2832); ctx.stroke();
-
     if (alarm) {
       var p = 0.55 + 0.45 * Math.abs(Math.sin(t * 7));
       ctx.strokeStyle = 'rgba(255,77,77,' + p.toFixed(2) + ')';
@@ -295,33 +287,99 @@
     }
   }
 
+  /* The slot holder — the open bowl the flask sits in, matching the app. */
+  function drawHolder(x, y, w, h) {
+    ctx.strokeStyle = '#8D93B0';
+    ctx.lineWidth = Math.max(2, w * 0.07);
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.16, y + h * 0.18);
+    ctx.lineTo(x + w * 0.26, y + h * 0.80);
+    ctx.quadraticCurveTo(x + w * 0.28, y + h * 0.92, x + w * 0.42, y + h * 0.92);
+    ctx.lineTo(x + w * 0.58, y + h * 0.92);
+    ctx.quadraticCurveTo(x + w * 0.72, y + h * 0.92, x + w * 0.74, y + h * 0.80);
+    ctx.lineTo(x + w * 0.84, y + h * 0.18);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.38, y + h * 0.18);
+    ctx.lineTo(x + w * 0.50, y + h * 0.34);
+    ctx.lineTo(x + w * 0.62, y + h * 0.18);
+    ctx.stroke();
+  }
+
+  /* Cartoon pointer hand, drawn rather than loaded. */
+  function drawHand(x, y, press) {
+    var s = Math.min(L.pw * 0.125, 46);
+    ctx.save();
+    ctx.translate(x, y + s * 0.08 * press);
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#2A2140';
+    ctx.lineWidth = Math.max(1.6, s * 0.045);
+    // palm
+    ctx.beginPath();
+    ctx.ellipse(s * 0.30, s * 0.66, s * 0.34, s * 0.30, 0, 0, 6.2832);
+    ctx.fill(); ctx.stroke();
+    // pointing finger
+    ctx.beginPath();
+    roundRect(s * 0.10, s * 0.02, s * 0.26, s * 0.62, s * 0.13);
+    ctx.fill(); ctx.stroke();
+    // knuckles
+    ctx.beginPath();
+    roundRect(s * 0.36, s * 0.42, s * 0.22, s * 0.26, s * 0.10);
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+    // tap ring
+    if (press > 0.05) {
+      ctx.strokeStyle = 'rgba(255,255,255,' + (0.55 * press).toFixed(2) + ')';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(x, y, s * (0.20 + 0.55 * (1 - press)), 0, 6.2832);
+      ctx.stroke();
+    }
+  }
+
   // -------------------------------------------------------------- hit areas
   function trayRects() {
-    var n = Math.min(4, tray.length);
-    var out = [];
+    var n = Math.min(4, tray.length), out = [];
     var slotW = (L.pw - L.pad * 2) / 4;
     for (var i = 0; i < n; i++) {
-      out.push({
-        i: i,
-        x: L.ox + L.pad + slotW * i, y: L.trayY + L.trayH * 0.22,
-        w: slotW, h: L.trayH * 0.56
-      });
+      out.push({ i: i, x: L.ox + L.pad + slotW * i, y: L.trayY + L.trayH * 0.30,
+                 w: slotW, h: L.trayH * 0.52 });
     }
     return out;
   }
-
   function slotRects() {
-    var out = [];
-    var slotW = (L.pw - L.pad * 2) / 4;
+    var out = [], slotW = (L.pw - L.pad * 2) / 4;
     for (var i = 0; i < SLOTS; i++) {
       out.push({ i: i, x: L.ox + L.pad + slotW * i, y: L.slotY, w: slotW, h: L.slotH });
     }
     return out;
   }
+  function ctaRect() {
+    var w = L.pw * 0.62, h = L.ctaH * 0.66;
+    return { x: L.ox + (L.pw - w) / 2, y: L.ctaY + (L.ctaH - h) / 2, w: w, h: h };
+  }
 
   // ----------------------------------------------------------------- update
+  function cellCenter(i) {
+    var x = i % COLS, y = (i / COLS) | 0;
+    return { x: L.board.x + (x + 0.5) * L.cell, y: L.board.y + (y + 0.5) * L.cell };
+  }
+
+  /* The tray index the hand should point at: first bottle with work now. */
+  function hintIndex() {
+    var info = trayRects();
+    for (var i = 0; i < info.length; i++) {
+      if (matchesFor(tray[i].color).length > 0) return i;
+    }
+    return 0;
+  }
+
   function step(dt) {
     t += dt;
+    if (tutorial) handT += dt;
     if (won) return;
 
     for (var s = 0; s < SLOTS; s++) {
@@ -330,28 +388,23 @@
       var m = matchesFor(b.color);
       b.starving = m.length === 0;
       if (b.starving) continue;
-
       b.budget = (b.budget || 0) + FILL_RATE * dt;
       while (b.budget >= 1 && b.left > 0) {
         m = matchesFor(b.color);
         if (!m.length) break;
         b.budget -= 1;
-        // Deepest row first — the real game's rule.
         var pick = m[0];
         for (var k = 1; k < m.length; k++) if (m[k].row > pick.row) pick = m[k];
         taken[pick.cell] = true;
         takenAt[pick.cell] = t;
-        b.left--;
-        remaining--;
-        var cc = cellCenter(pick.cell);
-        var sr = slotRects()[s];
-        flights.push({
-          x: cc.x, y: cc.y,
-          tx: sr.x + sr.w / 2, ty: sr.y + sr.h * 0.72,
-          age: 0, color: PALETTE[b.color]
-        });
-        if (remaining <= 0) { won = true; wonAt = t; }
+        b.left--; remaining--;
+        sfxTick(t);
+        var cc = cellCenter(pick.cell), sr = slotRects()[s];
+        flights.push({ x: cc.x, y: cc.y, tx: sr.x + sr.w / 2, ty: sr.y + sr.h * 0.72,
+                       age: 0, color: PALETTE[b.color] });
+        if (remaining <= 0) { won = true; wonAt = t; sfxWin(); }
         if (b.left <= 0) {
+          sfxPop();
           for (var q = 0; q < 10; q++) {
             sparks.push({ x: sr.x + sr.w / 2, y: sr.y + sr.h * 0.6,
               vx: (Math.random() - 0.5) * 260, vy: -Math.random() * 260 - 40,
@@ -362,7 +415,6 @@
         }
       }
     }
-
     for (var f = flights.length - 1; f >= 0; f--) {
       flights[f].age += dt;
       if (flights[f].age > 0.34) flights.splice(f, 1);
@@ -374,76 +426,17 @@
     }
   }
 
-  function cellCenter(i) {
-    var x = i % COLS, y = (i / COLS) | 0;
-    return { x: L.board.x + (x + 0.5) * L.cell, y: L.board.y + (y + 0.5) * L.cell };
-  }
-
   // ------------------------------------------------------------------- draw
   function draw() {
     var g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, BG_TOP); g.addColorStop(1, BG_BOT);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-    // Header.
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = '700 ' + Math.round(Math.min(L.pw * 0.085, 34)) + 'px "Trebuchet MS",sans-serif';
-    ctx.fillText('Drain the picture', L.ox + L.pw / 2, L.board.y * 0.40);
-    ctx.fillStyle = '#B9AEE0';
-    ctx.font = '600 ' + Math.round(Math.min(L.pw * 0.046, 17)) + 'px "Trebuchet MS",sans-serif';
-    ctx.fillText('Tap a bottle — it drinks from the bottom edge',
-                 L.ox + L.pw / 2, L.board.y * 0.40 + Math.min(L.pw * 0.080, 30));
+    drawHud();
+    drawBoard();
+    drawSlots();
+    drawTray();
 
-    // Board.
-    ctx.fillStyle = PANEL_DEEP;
-    roundRect(L.board.x - L.cell * 0.35, L.board.y - L.cell * 0.35,
-              L.board.size + L.cell * 0.7, L.board.size + L.cell * 0.7,
-              L.cell * 0.7);
-    ctx.fill();
-    for (var i = 0; i < cells.length; i++) {
-      var c = cellCenter(i);
-      if (taken[i]) {
-        drawSocket(c.x, c.y, L.cell);
-        var age = t - takenAt[i];
-        if (age >= 0 && age < 0.3) {
-          drawBead(c.x, c.y, L.cell, PALETTE[cells[i]], 1 - age / 0.3);
-        }
-      } else {
-        drawBead(c.x, c.y, L.cell, PALETTE[cells[i]]);
-      }
-    }
-
-    // Slots.
-    var sr = slotRects();
-    for (var s = 0; s < SLOTS; s++) {
-      var r = sr[s];
-      ctx.fillStyle = 'rgba(255,255,255,0.05)';
-      roundRect(r.x + r.w * 0.18, r.y + r.h * 0.15, r.w * 0.64, r.h * 0.8, r.w * 0.12);
-      ctx.fill();
-      var b = slots[s];
-      if (b) {
-        drawFlask(r.x + r.w / 2, r.y + r.h * 0.95, r.w * 0.60, r.h * 0.95,
-                  PALETTE[b.color], String(b.left), 1 - b.left / b.cap, b.starving);
-      }
-    }
-
-    // Tray.
-    ctx.fillStyle = PANEL;
-    roundRect(L.ox, L.trayY, L.pw, L.trayH + 30, 26); ctx.fill();
-    var tr = trayRects();
-    for (var j = 0; j < tr.length; j++) {
-      var q = tr[j], bo = tray[q.i];
-      drawFlask(q.x + q.w / 2, q.y + q.h, q.w * 0.62, q.h,
-                PALETTE[bo.color], String(bo.cap), 0.16, false);
-    }
-    if (tray.length > 4) {
-      ctx.fillStyle = '#7C6FA8';
-      ctx.font = '600 13px "Trebuchet MS",sans-serif';
-      ctx.fillText('+' + (tray.length - 4) + ' more', L.ox + L.pw / 2, L.trayY + L.trayH * 0.93);
-    }
-
-    // Flying beads + sparks.
     for (var f = 0; f < flights.length; f++) {
       var fl = flights[f], p = fl.age / 0.34;
       var x = fl.x + (fl.tx - fl.x) * p;
@@ -458,53 +451,171 @@
       ctx.globalAlpha = 1;
     }
 
-    // If every docked bottle is starving the player is stuck, and nothing
-    // on screen says the way out. Spell it out — an ad that looks broken is
-    // an ad that gets closed.
-    var live = slots.filter(Boolean);
-    if (!won && live.length === SLOTS && live.every(function (b) { return b.starving; })) {
-      var bw2 = L.pw * 0.82, bh2 = Math.min(46, H * 0.06);
-      var bx2 = L.ox + (L.pw - bw2) / 2, by2 = L.slotY - bh2 - 8;
-      ctx.fillStyle = 'rgba(255,77,77,0.92)';
-      roundRect(bx2, by2, bw2, bh2, bh2 / 2); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = '700 ' + Math.round(bh2 * 0.34) + 'px "Trebuchet MS",sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('All bottles blocked — tap one to take it back',
-                   L.ox + L.pw / 2, by2 + bh2 / 2);
-    }
-
+    drawCta();
+    if (tutorial && !won) drawTutorial();
+    if (!won) drawStuckHint();
     if (won) drawWin();
+  }
+
+  function drawHud() {
+    var x = L.ox + L.pad, w = L.pw - L.pad * 2, y = L.hudH * 0.32;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = TEXT;
+    ctx.font = '700 ' + Math.round(Math.min(L.pw * 0.048, 19)) + 'px "Trebuchet MS",sans-serif';
+    ctx.fillText('1. Heart', x, y);
+    var pct = total ? Math.floor((1 - remaining / total) * 100) : 0;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#FFD43B';
+    ctx.fillText(pct + '%', x + w, y);
+    // progress bar
+    var by = y + Math.min(L.pw * 0.05, 20), bh = Math.max(7, L.pw * 0.021);
+    ctx.fillStyle = PANEL_DEEP;
+    roundRect(x, by, w, bh, bh / 2); ctx.fill();
+    var pw = w * (total ? (1 - remaining / total) : 0);
+    if (pw > 2) {
+      var pg = ctx.createLinearGradient(x, 0, x + w, 0);
+      pg.addColorStop(0, '#3BC9DB'); pg.addColorStop(1, '#51CF66');
+      ctx.fillStyle = pg;
+      roundRect(x, by, pw, bh, bh / 2); ctx.fill();
+    }
+  }
+
+  function drawBoard() {
+    var b = L.board, m = L.cell * 0.45;
+    // machine frame
+    ctx.fillStyle = FRAME;
+    roundRect(b.x - m * 1.5, b.y - m * 1.5, b.size + m * 3, b.size + m * 3, L.cell * 0.9); ctx.fill();
+    ctx.strokeStyle = FRAME_LIGHT; ctx.lineWidth = 2;
+    roundRect(b.x - m * 1.5, b.y - m * 1.5, b.size + m * 3, b.size + m * 3, L.cell * 0.9); ctx.stroke();
+    ctx.fillStyle = PANEL_DEEP;
+    roundRect(b.x - m, b.y - m, b.size + m * 2, b.size + m * 2, L.cell * 0.7); ctx.fill();
+
+    for (var i = 0; i < cells.length; i++) {
+      var c = cellCenter(i);
+      if (taken[i]) {
+        drawSocket(c.x, c.y, L.cell);
+        var age = t - takenAt[i];
+        if (age >= 0 && age < 0.3) drawBead(c.x, c.y, L.cell, PALETTE[cells[i]], 1 - age / 0.3);
+      } else {
+        drawBead(c.x, c.y, L.cell, PALETTE[cells[i]]);
+      }
+    }
+  }
+
+  function drawSlots() {
+    var sr = slotRects();
+    for (var s = 0; s < SLOTS; s++) {
+      var r = sr[s];
+      drawHolder(r.x + r.w * 0.14, r.y, r.w * 0.72, r.h);
+      var b = slots[s];
+      if (b) {
+        drawFlask(r.x + r.w / 2, r.y + r.h * 0.92, r.w * 0.58, r.h * 0.92,
+                  PALETTE[b.color], String(b.left), 1 - b.left / b.cap, b.starving);
+      }
+    }
+  }
+
+  function drawTray() {
+    ctx.fillStyle = PANEL;
+    roundRect(L.ox, L.trayY, L.pw, L.trayH + 40, 26); ctx.fill();
+    var tr = trayRects();
+    for (var j = 0; j < tr.length; j++) {
+      var q = tr[j], bo = tray[q.i];
+      drawFlask(q.x + q.w / 2, q.y + q.h, q.w * 0.60, q.h,
+                PALETTE[bo.color], String(bo.cap), 0.16, false);
+    }
+    if (tray.length > 4) {
+      ctx.fillStyle = '#7C6FA8';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = '600 13px "Trebuchet MS",sans-serif';
+      ctx.fillText('+' + (tray.length - 4) + ' more', L.ox + L.pw / 2, L.trayY + L.trayH * 0.88);
+    }
+  }
+
+  function drawCta() {
+    var r = ctaRect();
+    var bg = ctx.createLinearGradient(0, r.y, 0, r.y + r.h);
+    bg.addColorStop(0, CTA_TOP); bg.addColorStop(1, CTA_BOT);
+    var pulse = 1 + Math.sin(t * 3) * 0.02;
+    ctx.save();
+    ctx.translate(r.x + r.w / 2, r.y + r.h / 2); ctx.scale(pulse, pulse);
+    ctx.translate(-(r.x + r.w / 2), -(r.y + r.h / 2));
+    ctx.fillStyle = bg;
+    roundRect(r.x, r.y, r.w, r.h, r.h / 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 ' + Math.round(r.h * 0.42) + 'px "Trebuchet MS",sans-serif';
+    ctx.fillText('PLAY FREE', r.x + r.w / 2, r.y + r.h / 2);
+    ctx.restore();
+  }
+
+  /* Hand pointer: loops "move in and tap" over the bottle that has work,
+     until the player docks their first bottle, then it gets out of the way. */
+  function drawTutorial() {
+    var tr = trayRects();
+    var target = tr[hintIndex()];
+    if (!target) return;
+    var cycle = 1.9;
+    var ph = (handT % cycle) / cycle;
+    var press = ph > 0.55 && ph < 0.75 ? 1 - Math.abs((ph - 0.65) / 0.10) : 0;
+    var appear = Math.min(1, ph / 0.22);
+    var hx = target.x + target.w * 0.46;
+    var hy = target.y + target.h * 0.04 + (1 - appear) * 38;
+    ctx.globalAlpha = Math.min(1, appear);
+    drawHand(hx, hy, press);
+    ctx.globalAlpha = 1;
+
+    var msg = 'Tap a bottle — it drinks the picture';
+    var fs = Math.round(Math.min(L.pw * 0.042, 16));
+    ctx.font = '600 ' + fs + 'px "Trebuchet MS",sans-serif';
+    var tw = ctx.measureText(msg).width + 26;
+    var bx = L.ox + (L.pw - tw) / 2, by = L.trayY + 3;
+    ctx.fillStyle = 'rgba(21,15,44,0.92)';
+    roundRect(bx, by, tw, fs * 2, fs); ctx.fill();
+    ctx.fillStyle = TEXT_SOFT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(msg, L.ox + L.pw / 2, by + fs);
+  }
+
+  function drawStuckHint() {
+    var live = slots.filter(Boolean);
+    if (live.length !== SLOTS || !live.every(function (b) { return b.starving; })) return;
+    var bw = L.pw * 0.82, bh = Math.min(44, H * 0.058);
+    var bx = L.ox + (L.pw - bw) / 2, by = L.slotY - bh - 6;
+    ctx.fillStyle = 'rgba(255,77,77,0.92)';
+    roundRect(bx, by, bw, bh, bh / 2); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = '700 ' + Math.round(bh * 0.34) + 'px "Trebuchet MS",sans-serif';
+    ctx.fillText('All bottles blocked — tap one to take it back', L.ox + L.pw / 2, by + bh / 2);
   }
 
   function drawWin() {
     var p = Math.min(1, (t - wonAt) / 0.45);
     ctx.fillStyle = 'rgba(10,6,26,' + (0.80 * p).toFixed(2) + ')';
     ctx.fillRect(0, 0, W, H);
-    var cw = Math.min(L.pw * 0.86, 400), ch = Math.min(H * 0.46, 330);
+    var cw = Math.min(L.pw * 0.86, 400), ch = Math.min(H * 0.44, 320);
     var cx = L.ox + (L.pw - cw) / 2, cy = (H - ch) / 2;
     ctx.save();
     ctx.translate(L.ox + L.pw / 2, H / 2); ctx.scale(0.85 + 0.15 * p, 0.85 + 0.15 * p);
     ctx.translate(-(L.ox + L.pw / 2), -H / 2);
-    var g = ctx.createLinearGradient(0, cy, 0, cy + ch);
-    g.addColorStop(0, '#3A2F68'); g.addColorStop(1, PANEL);
-    ctx.fillStyle = g; roundRect(cx, cy, cw, ch, 28); ctx.fill();
+    var g2 = ctx.createLinearGradient(0, cy, 0, cy + ch);
+    g2.addColorStop(0, '#3A2F68'); g2.addColorStop(1, PANEL);
+    ctx.fillStyle = g2; roundRect(cx, cy, cw, ch, 28); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 1.5;
     roundRect(cx, cy, cw, ch, 28); ctx.stroke();
-
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = '#FFD43B';
     ctx.font = '700 ' + Math.round(cw * 0.115) + 'px "Trebuchet MS",sans-serif';
-    ctx.fillText('Picture cleared!', L.ox + L.pw / 2, cy + ch * 0.22);
-    ctx.fillStyle = '#B9AEE0';
+    ctx.fillText('Picture cleared!', L.ox + L.pw / 2, cy + ch * 0.24);
+    ctx.fillStyle = TEXT_SOFT;
     ctx.font = '600 ' + Math.round(cw * 0.052) + 'px "Trebuchet MS",sans-serif';
-    ctx.fillText('300 more levels are waiting.', L.ox + L.pw / 2, cy + ch * 0.40);
-    ctx.fillText('No timers. No lives. Plays offline.', L.ox + L.pw / 2, cy + ch * 0.52);
-
+    ctx.fillText('300 more levels are waiting.', L.ox + L.pw / 2, cy + ch * 0.44);
+    ctx.fillText('No timers. No lives. Plays offline.', L.ox + L.pw / 2, cy + ch * 0.56);
     var bw = cw * 0.74, bh = ch * 0.20;
-    var bx = L.ox + (L.pw - bw) / 2, by = cy + ch * 0.66;
+    var bx = L.ox + (L.pw - bw) / 2, by = cy + ch * 0.70;
     var bg = ctx.createLinearGradient(0, by, 0, by + bh);
-    bg.addColorStop(0, '#FFB13D'); bg.addColorStop(1, '#FF7A1A');
+    bg.addColorStop(0, CTA_TOP); bg.addColorStop(1, CTA_BOT);
     ctx.fillStyle = bg; roundRect(bx, by, bw, bh, bh / 2); ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.font = '700 ' + Math.round(bh * 0.42) + 'px "Trebuchet MS",sans-serif';
@@ -517,12 +628,10 @@
   function hit(r, x, y) { return x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h; }
 
   function onTap(x, y) {
-    if (won) {
-      if (L.cta && hit(L.cta, x, y)) install();
-      else install();               // the whole win card is clickable
-      return;
-    }
-    // Tapping a docked bottle sends it back — this build cannot dead-end.
+    ac(); // unlock audio on the first gesture
+    if (won) { install(); return; }
+    if (hit(ctaRect(), x, y)) { install(); return; }
+
     var sr = slotRects();
     for (var s = 0; s < SLOTS; s++) {
       if (slots[s] && hit(sr[s], x, y)) {
@@ -530,6 +639,7 @@
         slots[s] = null;
         b.cap = b.left; b.budget = 0; b.starving = false;
         tray.push(b);
+        sfxDock();
         return;
       }
     }
@@ -541,6 +651,8 @@
         var bottle = tray.splice(tr[j].i, 1)[0];
         bottle.budget = 0; bottle.starving = false;
         slots[free] = bottle;
+        sfxDock();
+        if (!everDocked) { everDocked = true; tutorial = false; }
         return;
       }
     }
@@ -555,73 +667,53 @@
   window.addEventListener('resize', layout);
 
   // ------------------------------------------------------------- CTA / loop
-  // Replace CTA_URL for a plain web landing page. On an ad network the
-  // network's own handler takes precedence and CTA_URL is never used.
   var CTA_URL = 'https://play.google.com/store/apps/details?id=com.megz.coloro';
-
   function install() {
     try {
       if (typeof mraid !== 'undefined' && mraid.open) { mraid.open(CTA_URL); return; }
-      if (typeof FbPlayableAd !== 'undefined' &&
-          FbPlayableAd.onCTAClick) { FbPlayableAd.onCTAClick(); return; }
+      if (typeof FbPlayableAd !== 'undefined' && FbPlayableAd.onCTAClick) { FbPlayableAd.onCTAClick(); return; }
       if (typeof ExitApi !== 'undefined' && ExitApi.exit) { ExitApi.exit(); return; }
-    } catch (err) { /* fall through to a plain navigation */ }
+    } catch (err) {}
     window.open(CTA_URL, '_blank');
   }
 
   function frame(now) {
-    // dt is clamped, so a tab that was hidden for a minute resumes with a
-    // normal frame instead of fast-forwarding the whole level.
     var dt = Math.min(0.05, (now - lastFrame) / 1000 || 0);
     lastFrame = now;
-    step(dt);
-    draw();
+    step(dt); draw();
     requestAnimationFrame(frame);
   }
 
-  // Ad containers routinely start a creative hidden and reveal it later, and
-  // browsers suspend requestAnimationFrame while a document is hidden. Drop
-  // the stale timestamp on the way back so the first visible frame is a
-  // normal one rather than a jump.
   document.addEventListener('visibilitychange', function () {
     if (!document.hidden) lastFrame = performance.now();
   });
 
-  // QA hook. requestAnimationFrame does not run in a hidden tab, so an
-  // automated check cannot observe the simulation by waiting; this lets it
-  // drive the clock directly and assert on real state. Inert in normal play.
+  // QA hook — requestAnimationFrame does not run in a hidden tab, so an
+  // automated check drives the clock directly instead of waiting.
   window.__coloroQA = {
     step: function (seconds, slices) {
       var n = slices || Math.max(1, Math.round(seconds / 0.02));
       for (var i = 0; i < n; i++) step(seconds / n);
       draw();
     },
-    tapTray: function (i) {
-      var r = trayRects()[i];
-      if (r) onTap(r.x + r.w / 2, r.y + r.h / 2);
-    },
-    tapSlot: function (i) {
-      var r = slotRects()[i];
-      if (r) onTap(r.x + r.w / 2, r.y + r.h / 2);
-    },
+    tapTray: function (i) { var r = trayRects()[i]; if (r) onTap(r.x + r.w / 2, r.y + r.h / 2); },
+    tapSlot: function (i) { var r = slotRects()[i]; if (r) onTap(r.x + r.w / 2, r.y + r.h / 2); },
     trayInfo: function () {
       return tray.slice(0, 4).map(function (b) {
-        return { color: b.color, cap: b.cap,
-                 hasWork: matchesFor(b.color).length > 0 };
+        return { color: b.color, cap: b.cap, hasWork: matchesFor(b.color).length > 0 };
       });
     },
     state: function () {
-      return {
-        t: +t.toFixed(2), remaining: remaining, won: won, tray: tray.length,
+      return { t: +t.toFixed(2), remaining: remaining, won: won, tray: tray.length,
+        tutorial: tutorial,
         slots: slots.map(function (b) {
           return b ? { color: b.color, left: b.left, starving: !!b.starving } : null;
-        })
-      };
+        }) };
     }
   };
 
-  layout();
-  reset();
+  muted = /[?&]mute=1/.test(location.search);
+  layout(); reset();
   requestAnimationFrame(function (n) { lastFrame = n; frame(n); });
 })();
 </script>

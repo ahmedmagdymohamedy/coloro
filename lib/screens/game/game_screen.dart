@@ -477,6 +477,19 @@ class GameScreenState extends State<GameScreen>
     Navigator.of(context).pop(GameExit.replay);
   }
 
+  /// Leaving to the menu from a finished board.
+  ///
+  /// This goes through the same gate as every other exit, because it used
+  /// to be the one that didn't — and players found it: lose, tap Home to
+  /// dodge the ad, then start the next attempt from the menu. Closing it
+  /// also makes the ad honest. It isn't a tax on retrying specifically; it
+  /// is simply what happens when you leave a level, whichever door you use.
+  Future<void> _exitToMenu() async {
+    await _showExitInterstitial('interstitial_menu');
+    if (!mounted) return;
+    Navigator.of(context).pop(GameExit.toMenu);
+  }
+
   Future<void> _showExitInterstitial(String format) async {
     if (!AdService.instance.supported) return;
     final shown = await AdService.instance.maybeShowInterstitial(
@@ -687,7 +700,7 @@ class GameScreenState extends State<GameScreen>
             Positioned.fill(
               child: LevelFailedOverlay(
                 onRetry: _retryLevel,
-                onMenu: () => Navigator.of(context).pop(GameExit.toMenu),
+                onMenu: _exitToMenu,
                 // Repeatable: every jam can be bought off with another slot
                 // until the machine reaches its ceiling, after which the
                 // level has to be replayed.
@@ -706,8 +719,8 @@ class GameScreenState extends State<GameScreen>
                 grid: game.grid,
                 hasNextLevel: widget.hasNextLevel,
                 onNext: _goToNextLevel,
-                onReplay: () => Navigator.of(context).pop(GameExit.replay),
-                onMenu: () => Navigator.of(context).pop(GameExit.toMenu),
+                onReplay: _retryLevel,
+                onMenu: _exitToMenu,
               ),
             ),
           // Fast-forward badge while the player holds the screen.

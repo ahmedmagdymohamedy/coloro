@@ -18,34 +18,25 @@ import 'package:flutter/material.dart';
 /// the flying-pixel VFX, the menu preview) goes through [of], which is why
 /// a pixel and the bottle drinking it now read as the same color.
 abstract final class DisplayPalette {
-  /// Lightness is *remapped*, not clamped: `L' = _floor + L * _span`. A
-  /// clamp would collapse two different dark colors onto the same value;
-  /// a linear remap keeps their ordering and their distance, so the
-  /// picture still reads as the original artwork — just lit.
-  static const _lightnessFloor = 0.44;
-  static const _lightnessSpan = 0.42; // → L' ∈ [0.44, 0.86]
+  /// The palette is now a fixed, hand-tuned twelve (see [GamePalette]) that
+  /// is authored display-ready, so this is a pass-through.
+  ///
+  /// It used to remap lightness into `[0.44, 0.86]` and lift saturation, to
+  /// rescue the dark palettes the old quantizer derived from each level's
+  /// art. Applying that to a fixed palette actively destroys it: the remap
+  /// compresses all twelve colours into one bright band and pulls the
+  /// closest pair from **62 apart down to 21** — far below the 52 at which
+  /// two colours read as the same one. That is the exact failure the fixed
+  /// palette exists to prevent.
+  ///
+  /// This stays as the single entry point every renderer goes through — the
+  /// board's beads, the flasks, the flying pixels, the menu previews — which
+  /// is what guarantees a bottle and the pixels it drinks are the same
+  /// colour. If a future palette ever needs conditioning again, it belongs
+  /// here and nowhere else.
+  static Color of(int argb) => Color(argb);
 
-  /// Saturation is lifted the same way, but only for colors that actually
-  /// have a hue. A true grey has an arbitrary hue value, so boosting its
-  /// saturation would tint it an essentially random color.
-  static const _greyThreshold = 0.08;
-  static const _saturationFloor = 0.32;
-  static const _saturationSpan = 0.68;
-
-  /// The rendered form of a palette color.
-  static Color of(int argb) => fromColor(Color(argb));
-
-  static Color fromColor(Color raw) {
-    final hsl = HSLColor.fromColor(raw);
-    final lightness = _lightnessFloor + hsl.lightness * _lightnessSpan;
-    final saturation = hsl.saturation < _greyThreshold
-        ? hsl.saturation
-        : (_saturationFloor + hsl.saturation * _saturationSpan).clamp(0.0, 1.0);
-    return hsl
-        .withLightness(lightness.clamp(0.0, 1.0))
-        .withSaturation(saturation)
-        .toColor();
-  }
+  static Color fromColor(Color raw) => raw;
 
   /// A whole palette, rendered. Cached per identity so the atlas and the
   /// flask painter never recompute the same conversion per frame.

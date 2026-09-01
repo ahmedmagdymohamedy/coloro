@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Meta (Facebook) App Events credentials.
+
+  These are ANDROID ONLY on purpose. The matching keys are deliberately NOT
+  in ios/Runner/Info.plist, which is what keeps the Facebook SDK inert on
+  iOS: with no app id to read, it never initialises there. See
+  marketing/docs/facebook-app-events.md for why iOS is held back — the short
+  version is that App Store Connect already refused one submission of this
+  app over tracking signals, and turning the SDK on for iOS needs a real
+  ATT + UMP consent flow first.
+
+  Neither value is a secret. The app id is public, and the client token is
+  designed to be embedded in a shipped client — it grants no account access.
+-->
+<resources>
+    <string name="facebook_app_id">1531517322075227</string>
+    <string name="facebook_client_token">03967af133d8941fb7f80ce052a3d9d5</string>
+</resources>

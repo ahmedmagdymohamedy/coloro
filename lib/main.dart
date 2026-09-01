@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'app/coloro_app.dart';
 import 'core/ads/ad_service.dart';
 import 'core/analytics/analytics_service.dart';
+import 'core/analytics/facebook_sink.dart';
+import 'core/analytics/meta_events.dart';
 import 'core/notifications/notification_service.dart';
 import 'data/progress_store.dart';
 import 'firebase_options.dart';
@@ -29,8 +31,12 @@ Future<void> main() async {
   // platform, no network, a dev desktop build) must never stop the game
   // from starting.
   await _initFirebase();
-  unawaited(AdService.instance.init().catchError(
-      (Object e) => debugPrint('AdMob init failed: \$e')));
+  _initMetaEvents();
+  unawaited(
+    AdService.instance.init().catchError(
+      (Object e) => debugPrint('AdMob init failed: \$e'),
+    ),
+  );
 
   // A returning player who is already past the onboarding levels must see the
   // banner on the very first frame, not only after finishing another level.
@@ -44,6 +50,17 @@ Future<void> main() async {
   unawaited(NotificationService.instance.syncPushRegistration());
 
   runApp(const ColoroApp());
+}
+
+/// Meta App Events, alongside Firebase. Android-only and best-effort: if the
+/// SDK is missing or the platform is not supported, [MetaEvents] simply stays
+/// inert and the game is unaffected. See [FacebookSink] for why iOS is held
+/// back deliberately.
+void _initMetaEvents() {
+  final sink = FacebookSink.createIfSupported();
+  if (sink == null) return;
+  MetaEvents.instance.configure(sink);
+  debugPrint('Meta App Events ready.');
 }
 
 Future<void> _initFirebase() async {

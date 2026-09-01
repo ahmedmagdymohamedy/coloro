@@ -1,339 +1,136 @@
-# ⚠️ READ THIS FIRST
+# Coloro — engineering handoff
 
-**The current git HEAD would ship a broken game. Your working tree is fine.**
+**Last updated:** 1 Sep 2026.
+Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
-During this session HEAD moved from `ee72053` to `198de8c "add IOS ASO git
-push"` — something (or someone) committed the repo while I was mid-experiment.
-That commit captured `lib/game/drain_order.dart` in its **experiment-2**
-state, which I had already measured as making **77 of 300 levels
-unwinnable** (see §2).
+---
 
-- ✅ **The build that shipped (1.0.6+6) is correct.** It was compiled from the
-  working tree *after* I reverted the experiment, with all 62 tests green.
-- ❌ **`git show HEAD:lib/game/drain_order.dart` is the broken version.**
-  Anyone who builds from HEAD as committed ships a campaign where a quarter
-  of the levels cannot be completed.
+## Status
 
-**This is also on GitHub.** `198de8c` is on `origin/main`, so the broken
-drain order is on the remote too — any fresh clone, other machine, or CI job
-builds the unwinnable campaign until it's replaced.
+| | |
+|---|---|
+| **Google Play** | **LIVE.** Approved 27 Aug. Production = 1.0.7 (code 7), 177 countries. Listing art = 1.0.7 palette (replaced 1 Sep). **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
+| **App Store** | 1.0.6 (the **old palette**) is in Apple's review queue. 1.0.7 went to TestFlight only, per instruction. |
+| **This build** | `1.0.7+7` — fixed palette, ad fixes, playable v2. All 300 levels re-proved. |
+| **Git** | ⚠️ **33 files uncommitted.** HEAD is still `9812c96 "V 6"` from before this session. |
 
-**Fix: commit the current working tree *and push it*.** The tree contains the
-reverted, correct rule (`pick(candidates) => candidates.first`) plus the full
-write-up of why. I did not commit or push it myself because that wasn't
-something you asked for.
+---
 
-One more thing worth knowing: **something on this machine committed and
-pushed while I was working.** I never ran git. If that automation fires again
-now it will capture the correct tree and do no harm — but you should know it
-exists, because it is what put the broken state on the remote.
+## ⚠️ Commit the whole tree together
 
-Verify at any time with:
+The working tree is **the only copy of the source for the build now sitting in
+Google's review queue**, and this change set has a coupling hazard: the
+quantizer rewrite (`lib/`) and the repaired `assets/levels/levels.json` are a
+**matched pair**. The deals in `levels.json` were searched against this exact
+quantizer.
+
+**A partial commit — `lib/` without `assets/`, or the reverse — reconstructs
+exactly the unwinnable-campaign state this session existed to fix.** Commit
+and push everything in one go, then confirm:
 
 ```sh
-grep -n 'static int pick' lib/game/drain_order.dart
-# correct  → static int pick(List<int> candidates) => candidates.first;
-flutter test    # 62/62 must pass
+COLORO_FULL_SWEEP=1 flutter test test/stall_diagnostic_test.dart   # must be 303/303
 ```
 
----
-
-# Coloro — overnight release session
-
-**Session:** 2026-08-26, autonomous (Ahmed asleep).
-**Goal:** fix the reported experience problems, add Facebook app-events, ship
-to both stores, submit for review, and prepare the ad-campaign kit.
-
-Everything marketing-related lives in **`marketing/`**. This file is the
-engineering handoff.
+I did not commit because committing has not been asked for.
 
 ---
 
-## 1. Player notes → what was done
+## What changed in 1.0.7
 
-| # | Note | Status |
-|---|---|---|
-| 1 | Ads never shown on lose → replay | ✅ interstitial now on the retry path |
-| 2 | Don't dim the unused bottle — it destroys the colour (slots *and* tray) | ✅ dimming removed everywhere |
-| 3 | Dark levels: can't tell filled from empty | ✅ display luminance floor + colourless sockets |
-| 4 | Drain each row scattered, not left→right | ⚠️ **not shipped — see §2** |
-| 5 | The sound keeps speeding up | ✅ pitch ramp removed |
-| 6 | More haptic feedback | ✅ continuous drink pulse + milestones + stronger starve |
-| 7 | Label the hard levels as hard | ✅ HARD badge in the in-game HUD |
-| 8 | Make the rewarded-video button the primary one | ✅ promoted; retry/menu appear after 2s |
-| 9 | Speed up the colour draining | ✅ fill rate 4.5 → 7.0/s, hold-to-boost 2× → 3× |
-| 10 | Pixel shape isn't clear | ✅ chunky bevelled tiles with gaps + rim |
-| 11 | Can't match colours between bottles and pixels | ✅ one shared colour transform for both |
+### 1. Fixed 12-colour palette — the "two greens" fix
 
-### The one shared idea behind 3, 10 and 11
+`lib/data/game_palette.dart` is new and is now the only source of colour.
+Levels no longer derive a palette from their art; every pixel snaps to one of
+twelve.
 
-`lib/core/theme/display_palette.dart` is new and is now the **single source of
-truth for how a palette colour is drawn**. The bead atlas, the flask painter,
-the flying-pixel VFX, the menu previews and the level-complete reward all go
-through it, which is what makes a bottle and the pixels it drinks read as the
-same colour.
+Two constraints, both locked by `test/game_palette_test.dart`:
 
-It *remaps* lightness into `[0.44, 0.86]` rather than clamping it — a clamp
-would collapse two different dark colours onto the same value, a remap keeps
-their ordering and distance. **The puzzle data is untouched**: cells, palette
-indices and bottle counts are identical, so every shipped solvability proof
-still describes exactly the level the player gets.
+1. **One colour per 30° hue slot.** This is the one that answers the
+   complaint. A distance metric will happily call a dark cyan and a light
+   cyan "different"; a player reads them as one colour lighter.
+2. **Maximum minimum separation** under the quantizer's own metric →
+   **closest pair 62**, against the **52** at which the old code merged two
+   colours outright.
 
----
+`DisplayPalette.of()` is now a **pass-through**. Its lightness remap existed
+to rescue dark art-derived palettes; applied to a fixed palette it compresses
+the closest pair from 62 down to 21 and would undo the whole fix. It stays as
+the single entry point every renderer goes through, which is what keeps a
+flask and the pixels it drinks the same colour.
 
-## 2. Note #4 (scattered drain) — measured, then deliberately not shipped
+**All 300 levels re-proved solvable** (303/303). 242 were unaffected, 58
+needed a new deal, **0 unrepairable**. Only one lost difficulty (a weaker
+shuffle window). Final colour spread: 4 colours on 12 levels, 5 on 63, 6 on
+99, 7 on 78, 8 on 39, 9 on 9.
 
-This is the one request that was implemented, tested, and then **reverted on
-evidence**. It is worth reading before anyone tries it again.
+**Bottle capacity cap came down** (`bottle_factory.dart`): `min(40, total/3)`
+→ `min(20, total/4)`. Merging near-identical colours makes each surviving
+colour's cell count bigger, which under the old formula produced 40-capacity
+bottles that sat in a slot starving. This was the single biggest cause of
+levels becoming unwinnable after the palette change.
 
-The tie-break for "which equally-deep column does a bottle drink from" was
-changed from *leftmost* to *scattered*. `tool/reproof_deals.dart` (new) then
-re-proved the whole campaign, re-searching each level's `(shuffleWindow,
-dealSeed)` pair over the same space `tool/gen_levels.dart` searches — 40 seeds
-per window, every window down to 1:
+### 2. Ad fixes
 
-| tie-break | levels left unwinnable |
+| Report | Fix |
 |---|---|
-| leftmost (shipped) | **0 / 300** |
-| scattered per (level, row) | 71 / 300 |
-| scattered per level | 77 / 300 |
+| Banner too big | It requested `getLargeAnchoredAdaptiveBannerAdSize` — the *large* variant, ~2× height. Now a fixed **320×50**. The plugin has deprecated the normal adaptive size in favour of large, so adaptive isn't an option; a banner that crowds the board costs more in retention than it earns. |
+| Layout jumps when the banner appears | It reserved **zero** height until an ad loaded. The strip is now claimed as soon as ads unlock and painted panel-colour while empty. Still zero height during the ad-free onboarding levels. |
+| Ad escapable via Home after losing | Menu was the only exit without an ad. All four exits — next, retry, replay, menu — now share one gate (level ≥ 4, 30s apart). Double-back is deliberately left alone. |
 
-These are not seeds that need re-rolling. At window 1 the deal *is* the
-solver's own witness order, so a level failing there means the greedy witness
-cannot beat that board at all under the new rule. **A quarter of the campaign
-would have shipped unwinnable** — fatal for a game whose entire pitch is that
-every level is solver-verified.
+### 3. Playable v2 (`marketing/playable/coloro_playable.html`)
 
-Shipping the scattered drain therefore requires regenerating the levels
-(`dart run tool/gen_levels.dart`), which re-derives art *and* deals together.
-That is a content release, not a seed patch, and was too big to do safely
-tonight on top of a store submission.
+Rewritten to match the game: HUD with progress bar, machine frame, slot
+holders, tray panel, the new palette, **WebAudio-synthesised sound** (no
+files — the single-file/no-request rule still holds), a **cartoon hand** that
+loops "move in and tap" on the bottle that has work until the first dock, and
+a persistent CTA. Still one file, ~27 KB, zero network requests.
 
-What partly addresses the complaint anyway: the fill rate went 4.5 → 7.0/s, so
-four slots now dissolve the board from four places at once, and the
-typewriter feel is much weaker than it was.
-
-The full reasoning, the numbers and the re-run command are recorded in
-`lib/game/drain_order.dart` so this doesn't get re-attempted blind.
-
-**Recommended next release:** regenerate the campaign with the scattered rule
-enabled, gate it on `COLORO_FULL_SWEEP=1`, and ship it as a content update.
+Verified through its own QA hook: wins with **0 cells left**, tutorial
+dismisses on first dock, win card renders.
 
 ---
 
-## 3. Verification
+## New tools
 
-- `flutter analyze lib/ test/ tool/` — clean
-- `flutter test` — **62/62 pass**
-- `COLORO_FULL_SWEEP=1 flutter test test/stall_diagnostic_test.dart` —
-  **303/303 pass**: every one of the 300 shipped levels re-proved solvable
-  against the art on disk under the drain rule this build actually ships.
-  That is the check that matters most, and it is green.
-
----
-
-## 4. Release: 1.0.6+6 is uploaded to both stores
-
-`./scripts/deploy_mobile_version.sh` ran clean in **10m 23s**:
-
-- **Google Play** — AAB uploaded, assigned to the **internal** track, edit committed.
-- **TestFlight** — IPA validated and delivered (`UPLOAD SUCCEEDED`, delivery
-  UUID `d1a083a4-e14a-41df-b05d-1cea0727cd9e`). Apple emails when processing
-  finishes.
-
-Version was bumped `1.0.5+5 → 1.0.6+6` by hand before the run, because the
-script never touches pubspec and both stores burn a build number permanently
-on upload.
-
-## 5. Store submission — what I found
-
-### Google Play: the app has never been published
-
-Coloro is a **draft** (`مسودة`) with only an internal-testing release. Its
-temporary store name is still `com.megz.coloro (unreviewed)`. Production is
-listed as *inactive*. So this is a **first publication**, not an update.
-
-Good news on the biggest feared blocker: the **Megz Games** account
-(id `9004145411394454957`) already has apps in production (La3bangy, 6.74k
-active users), so production access exists — no 12-tester/14-day wall.
-
-**Send for review is greyed out** until the remaining app-content
-declarations are done. Play lists exactly two:
-
-| Declaration | State | Note |
-|---|---|---|
-| Advertising ID (`المعرّفات الإعلانية`) | **not started** | Hard blocker: Play refuses any release targeting Android 13+ until this is answered. The app does use it — AdMob, plus `com.google.android.gms.permission.AD_ID` is already in the manifest. |
-| Content rating (`تقييمات المحتوى`) | needs attention | Exists but flagged for edit |
-
-Useful ids for picking this up:
-- developer: `9004145411394454957`
-- app: `4973484828510117385`
-- publishing overview: `…/app/4973484828510117385/publishing`
-- app content: `…/app/4973484828510117385/app-content/overview`
-
-### Also worth knowing
-
-The account has an account-wide warning: **target API level must be updated
-by 31 Aug 2026** to keep shipping updates. Today is 26 Aug 2026. Coloro
-builds against Flutter's current default `targetSdk`, so it is very likely
-already compliant — but confirm it on the release before the deadline.
-
-### Google Play — what I completed in the console
-
-1. **Advertising ID declaration** — was not started, and is a hard blocker
-   (Play refuses any release targeting Android 13+ without it). Declared
-   **Yes**, with purposes **Analytics** and **Advertising or marketing** —
-   which is exactly what the app does (Firebase Analytics + AdMob) and is
-   consistent with the Data safety answers in `aso/README.md`. Play itself
-   confirmed the manifest carries `AD_ID`, so "Yes" was the only correct
-   answer. Saved.
-2. **Content rating** — a *completed* IARC rating already existed (3+ /
-   PEGI 3, submitted 22 Aug), but an unfinished newer questionnaire was
-   flagging the section. Completed it: category **Game**, and **No** to all
-   14 content questions (violence, fear, sexual content, gambling, language,
-   controlled substances, crude humour, digital purchases/NFTs, user
-   interaction, location sharing, Nazi symbolism, Korean national identity,
-   terrorism, realistic crime). All true for this game — no chat, no IAP, no
-   location use. Result: General/Everyone. Saved.
-   *Gotcha for next time: the questionnaire's Next button stays disabled
-   until you press **Save** first, even when every question is answered.*
-3. **Production release created** — production track had no release at all.
-   Created one and attached **version code 6 (1.0.6)** from the bundle
-   library (the build this session uploaded).
-
-4. **Target audience — corrected a real policy risk.** The declaration had
-   **every** age group ticked, including *5 and under*, *6–8* and *9–12*.
-   Targeting under-13s puts the app under Google Play's **Families policy**,
-   which requires child-directed ad treatment — and `lib/core/ads/ad_service.dart`
-   sends a plain `AdRequest()` with no `TagForChildDirectedTreatment` and
-   serves personalised ads. `aso/README.md` warns about this exact trap.
-   Left as **13–15, 16–17, 18+**, which matches how the game is actually
-   built and marketed. Had this shipped as-is it was a rejection — or worse,
-   a policy strike on the account.
-
-5. **Submitted for review.** All 12 pending changes sent to Google. Play's
-   own pre-launch checks ran clean first. Status is now *Changes under
-   review*; Google says reviews usually complete within 7 days.
-
-### Play data I verified before submitting
-
-| Item | Value |
+| Tool | What it does |
 |---|---|
-| App name | Coloro: Pixel Color Sort |
-| Package | com.megz.coloro |
-| Release | 1.0.6 (version code 6) — targetSdk **36**, minSdk 24, 11.8 MB |
-| Countries | 177 — worldwide |
-| Category | Games → Puzzle |
-| Content rating | Everyone / General |
-| Privacy policy | https://sites.google.com/view/ammegz |
-| Data safety, Ads, App access, Health, Financial, Government | all complete |
+| `tool/audit_palette.dart` | Reports what snapping does to all 300 levels, in seconds, without solving. Run this before any slow re-search. |
+| `tool/render_level.dart N out.png` | Renders a level's quantized grid to a PNG so colour work can be eyeballed without launching the app. |
+| `tool/reproof_deals.dart` | Re-proves all 300 levels and searches `dealSeed` → `shuffleWindow` → `maxColors` (cheapest knob first) for any that lost their winning line. |
+| `tool/apply_deal_patch.py` | Applies the patch **line-surgically**. `levels.json` does not round-trip through `json.dumps`, so a full rewrite would bury the changed numbers. |
+| `tool/probe_level.dart N` | Explains *why* one level is unsolvable — board shape, bottle sizes, and escalating search budgets. |
 
-The **targetSdk 36** finding also resolves the account-wide "target API level
-by 31 Aug 2026" warning for this app — it is already well past the bar.
+Two solver improvements worth knowing about, in `bottle_factory.dart`:
 
----
-
-## 6. App Store — blocked on your Apple ID
-
-`appstoreconnect.apple.com` is **logged out** in this Chrome profile
-(`authResult=FAILED`). Getting in needs your Apple ID password and 2FA.
-**I don't enter passwords**, so the iOS review submission is where I stopped.
-
-What is already done for iOS:
-
-- **Build 1.0.6 (6) is uploaded and accepted.** `altool` reported
-  `UPLOAD SUCCEEDED with no errors`, delivery UUID
-  `d1a083a4-e14a-41df-b05d-1cea0727cd9e`, 24.9 MB. Apple emails you when
-  processing finishes; it will then appear under TestFlight.
-- Store art was regenerated from the updated game and is on disk:
-  `aso/ios_iphone_69_1..5.png` (1320×2868) and `aso/ios_ipad_13_1..5.png`
-  (2064×2752).
-- All listing copy — name, subtitle, promo text, keywords, description,
-  privacy label — is written and ready to paste in `aso/listing_app_store.md`.
-
-### Your steps (about 15 minutes)
-
-1. Log in to <https://appstoreconnect.apple.com> → **Apps → Coloro**.
-2. Create the **1.0.6** version if it isn't there.
-3. Paste from `aso/listing_app_store.md`: subtitle, promotional text,
-   keywords, description. Upload the two screenshot sets above.
-4. Privacy policy URL: `https://sites.google.com/view/ammegz` (same one Play
-   now uses).
-5. **Age rating:** answer it the same way Play was answered — no objectionable
-   content, and **not** directed at children under 13. Keeping the two stores
-   consistent matters; see §5 for why the under-13 answer is the one to watch.
-6. Select build **1.0.6 (6)** → **Add for Review** → **Submit**.
-
-Two things already handled in the binary so Connect won't stop you:
-`ITSAppUsesNonExemptEncryption = false` is declared, and there is
-deliberately **no** `NSUserTrackingUsageDescription` — a previous submission
-was refused over exactly that (the comment in `ios/Runner/Info.plist` records
-it). Don't add the key back without a real ATT + UMP consent flow.
+- **`_Solver.winningOrder()`** — deals used to come from a *greedy* witness,
+  and when greedy failed the code fell back to the raw colour-sorted deal,
+  which is almost never winnable. It now falls back to the dock order of a
+  real backtracking solve.
+- **`_baseOrder` is memoised** — it depends only on the board and the chunk
+  seed, never on `shuffleWindow`/`dealSeed`. Without this the generator and
+  the reproof tool redid the expensive fallback on every seed attempt.
 
 ---
 
-## 7. Marketing — everything is in `marketing/`
+## iOS: the stores will diverge until you act
 
-| File | What it is |
-|---|---|
-| `marketing/playable/coloro_playable.html` | The HTML playable you asked for. One 20 KB file, zero network requests — works as a Google Ads playable, a landing-page embed, or straight off disk. |
-| `marketing/campaigns/google-ads-kit.md` | The full Google Ads kit: revenue arithmetic, campaign structure, all ad copy, creative specs, kill criteria. |
-| `marketing/docs/facebook-app-events.md` | Meta App Events: what's done, what's blocked, how to finish. |
-| `marketing/README.md` | Index. |
+Apple is reviewing **1.0.6 — the build with the near-identical colours**.
+1.0.7 was sent to TestFlight only, as instructed, because submitting a second
+version would replace the one in the queue and restart its clock.
 
-The playable plays the real mechanic on a 12×12 heart and takes ~25 seconds
-to clear. I verified it end-to-end through its own QA hook: a sensible player
-finishes with **0 cells left, 20 bottles, no rescues**. It cannot be lost —
-tapping a docked bottle returns it — and a banner appears if every bottle is
-blocked, because an ad that dead-ends is a wasted impression.
+So when Apple approves, the App Store ships the "two greens" build while Play
+ships the fix. **Once Apple's current review resolves, submit 1.0.7 (7) for
+iOS review** to bring the two stores back together. The build is already
+uploaded and waiting in TestFlight — it only needs selecting and submitting.
 
 ---
 
-## 8. Facebook — blocked at the same kind of wall
+## Verification
 
-The Coloro app was configured all the way to the final **Create app** click,
-then Meta demanded the account password. Nothing was created; the account is
-exactly as it was. The 2-minute finish, the SDK wiring, and the event map are
-in `marketing/docs/facebook-app-events.md`.
-
-The **code side is already written and shipped**:
-`lib/core/analytics/meta_events.dart` defines the Meta funnel and
-`analytics_service.dart` already fans every relevant event out to it. It is
-inert until a Meta app id is configured, which is why it was safe to include
-in today's build. Switching it on later is one small file.
-
----
-
-## 9. On the $10,000
-
-I'll say this plainly rather than let it sit unanswered: **I can't guarantee
-revenue, and nobody can.** What I can do is make the odds as good as the
-product and the arithmetic allow, and the arithmetic is in
-`marketing/campaigns/google-ads-kit.md` §1. The short version:
-
-At this app's current ARPU, **buying installs loses money** — 35,000 paid
-installs cost roughly $15,750 to earn roughly $10,000. So the plan that
-actually reaches the target is: organic/ASO first, **AdMob mediation** to lift
-eCPM 30–80% (the single highest-leverage thing left, and it needs no game
-changes), and only then a small paid test scaled purely where LTV beats CPI.
-
-The biggest unknown is retention, and the first 30 days of Firebase data will
-answer it. Revisit the whole plan against real D1/D7/D30 before committing
-budget.
-
----
-
-## 10. What I'd do first when you wake up
-
-1. **Commit the working tree** (see the warning at the top) — highest priority.
-2. Finish the **App Store submission** (§6) — ~15 minutes.
-3. Create the **Facebook app** (§8) — ~2 minutes, then the SDK is a small PR.
-4. Configure **AdMob mediation** before spending anything on ads.
-5. Watch for Google's review result; reviews usually land within 7 days.
-6. **After Play approves, refresh the store listing art.** The live listing
-   still carries the 22 Aug screenshots — the ones showing dimmed bottles and
-   unreadable dark boards, i.e. exactly the defects 1.0.6 fixes. The
-   regenerated set is already on disk: upload `aso/screenshot_1..5.png` and
-   `aso/feature_graphic.png`. I deliberately did **not** change the listing
-   before submitting, because editing listing assets mid-review can restart
-   the review clock.
+```sh
+flutter analyze lib/ test/ tool/
+flutter test
+COLORO_FULL_SWEEP=1 flutter test test/stall_diagnostic_test.dart   # all 300
+dart run tool/audit_palette.dart                                   # colour spread
+```

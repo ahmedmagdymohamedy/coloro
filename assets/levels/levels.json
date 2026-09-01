@@ -23,19 +23,19 @@
       "churn": 0.31,
       "shuffleWindow": 2,
       "dealSeed": 2016,
-      "bottles": 22
+      "bottles": 25
     },
     "3.png": {
       "name": "Sun",
       "gridSize": 15,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 225,
       "churn": 0.4,
       "shuffleWindow": 2,
       "dealSeed": 2993,
-      "bottles": 22
+      "bottles": 25
     },
     "4.png": {
       "name": "Heart",
@@ -47,31 +47,31 @@
       "churn": 0.37,
       "shuffleWindow": 2,
       "dealSeed": 3970,
-      "bottles": 23
+      "bottles": 25
     },
     "5.png": {
       "name": "Balloon",
       "gridSize": 20,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 5,
       "cells": 400,
       "churn": 0.43,
       "shuffleWindow": 4,
       "dealSeed": 5009,
-      "bottles": 36
+      "bottles": 39
     },
     "6.png": {
       "name": "Balloon",
       "gridSize": 15,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 225,
       "churn": 0.39,
       "shuffleWindow": 2,
       "dealSeed": 5924,
-      "bottles": 24
+      "bottles": 22
     },
     "7.png": {
       "name": "Diamond",
@@ -83,7 +83,7 @@
       "churn": 0.44,
       "shuffleWindow": 2,
       "dealSeed": 6901,
-      "bottles": 25
+      "bottles": 27
     },
     "8.png": {
       "name": "Balloon",
@@ -95,19 +95,19 @@
       "churn": 0.41,
       "shuffleWindow": 2,
       "dealSeed": 7878,
-      "bottles": 24
+      "bottles": 28
     },
     "9.png": {
       "name": "Diamond",
       "gridSize": 16,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 256,
       "churn": 0.44,
       "shuffleWindow": 2,
       "dealSeed": 8855,
-      "bottles": 23
+      "bottles": 26
     },
     "10.png": {
       "name": "Apple",
@@ -119,7 +119,7 @@
       "churn": 0.43,
       "shuffleWindow": 4,
       "dealSeed": 9894,
-      "bottles": 40
+      "bottles": 45
     },
     "11.png": {
       "name": "Heart",
@@ -131,7 +131,7 @@
       "churn": 0.3,
       "shuffleWindow": 2,
       "dealSeed": 10809,
-      "bottles": 21
+      "bottles": 26
     },
     "12.png": {
       "name": "Sun",
@@ -143,7 +143,7 @@
       "churn": 0.35,
       "shuffleWindow": 2,
       "dealSeed": 11786,
-      "bottles": 29
+      "bottles": 26
     },
     "13.png": {
       "name": "Star",
@@ -155,7 +155,7 @@
       "churn": 0.35,
       "shuffleWindow": 2,
       "dealSeed": 12763,
-      "bottles": 25
+      "bottles": 27
     },
     "14.png": {
       "name": "Apple",
@@ -167,19 +167,19 @@
       "churn": 0.32,
       "shuffleWindow": 2,
       "dealSeed": 13740,
-      "bottles": 22
+      "bottles": 28
     },
     "15.png": {
       "name": "Star",
       "gridSize": 21,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 441,
       "churn": 0.49,
       "shuffleWindow": 4,
       "dealSeed": 14779,
-      "bottles": 45
+      "bottles": 46
     },
     "16.png": {
       "name": "Sun",
@@ -191,7 +191,7 @@
       "churn": 0.34,
       "shuffleWindow": 2,
       "dealSeed": 15694,
-      "bottles": 24
+      "bottles": 29
     },
     "17.png": {
       "name": "Balloon",
@@ -203,7 +203,7 @@
       "churn": 0.43,
       "shuffleWindow": 2,
       "dealSeed": 16671,
-      "bottles": 22
+      "bottles": 26
     },
     "18.png": {
       "name": "Diamond",
@@ -215,31 +215,31 @@
       "churn": 0.45,
       "shuffleWindow": 2,
       "dealSeed": 17648,
-      "bottles": 21
+      "bottles": 27
     },
     "19.png": {
       "name": "Heart",
       "gridSize": 17,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 289,
       "churn": 0.39,
       "shuffleWindow": 2,
       "dealSeed": 18625,
-      "bottles": 26
+      "bottles": 24
     },
     "20.png": {
       "name": "Sun",
       "gridSize": 21,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 441,
       "churn": 0.44,
       "shuffleWindow": 4,
       "dealSeed": 19664,
-      "bottles": 38
+      "bottles": 48
     },
     "21.png": {
       "name": "Apple",
@@ -251,7 +251,7 @@
       "churn": 0.42,
       "shuffleWindow": 2,
       "dealSeed": 20579,
-      "bottles": 24
+      "bottles": 29
     },
     "22.png": {
       "name": "Heart",
@@ -263,67 +263,67 @@
       "churn": 0.35,
       "shuffleWindow": 2,
       "dealSeed": 21556,
-      "bottles": 25
+      "bottles": 30
     },
     "23.png": {
       "name": "Balloon",
       "gridSize": 17,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 289,
       "churn": 0.4,
       "shuffleWindow": 3,
       "dealSeed": 22564,
-      "bottles": 27
+      "bottles": 30
     },
     "24.png": {
       "name": "Star",
       "gridSize": 17,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 289,
       "churn": 0.39,
       "shuffleWindow": 3,
       "dealSeed": 23541,
-      "bottles": 24
+      "bottles": 26
     },
     "25.png": {
       "name": "Diamond",
       "gridSize": 21,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 441,
       "churn": 0.48,
       "shuffleWindow": 5,
       "dealSeed": 24580,
-      "bottles": 35
+      "bottles": 39
     },
     "26.png": {
       "name": "Apple",
       "gridSize": 17,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 289,
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 25495,
-      "bottles": 28
+      "bottles": 32
     },
     "27.png": {
       "name": "Apple",
       "gridSize": 17,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 289,
       "churn": 0.4,
       "shuffleWindow": 3,
       "dealSeed": 26472,
-      "bottles": 26
+      "bottles": 32
     },
     "28.png": {
       "name": "Balloon",
@@ -335,7 +335,7 @@
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 27449,
-      "bottles": 28
+      "bottles": 30
     },
     "29.png": {
       "name": "Diamond",
@@ -347,7 +347,7 @@
       "churn": 0.4,
       "shuffleWindow": 3,
       "dealSeed": 28426,
-      "bottles": 27
+      "bottles": 30
     },
     "30.png": {
       "name": "Balloon",
@@ -359,7 +359,7 @@
       "churn": 0.53,
       "shuffleWindow": 5,
       "dealSeed": 29465,
-      "bottles": 41
+      "bottles": 48
     },
     "31.png": {
       "name": "Diamond",
@@ -371,7 +371,7 @@
       "churn": 0.42,
       "shuffleWindow": 3,
       "dealSeed": 30380,
-      "bottles": 23
+      "bottles": 30
     },
     "32.png": {
       "name": "Sun",
@@ -383,14 +383,14 @@
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 31357,
-      "bottles": 32
+      "bottles": 34
     },
     "33.png": {
       "name": "Sun",
       "gridSize": 18,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 324,
       "churn": 0.37,
       "shuffleWindow": 3,
@@ -402,12 +402,12 @@
       "gridSize": 18,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 324,
       "churn": 0.37,
       "shuffleWindow": 3,
       "dealSeed": 33311,
-      "bottles": 24
+      "bottles": 32
     },
     "35.png": {
       "name": "Diamond",
@@ -419,19 +419,19 @@
       "churn": 0.52,
       "shuffleWindow": 5,
       "dealSeed": 34350,
-      "bottles": 43
+      "bottles": 49
     },
     "36.png": {
       "name": "Star",
       "gridSize": 18,
       "maxColors": 5,
       "hard": false,
-      "colors": 5,
+      "colors": 4,
       "cells": 324,
       "churn": 0.36,
       "shuffleWindow": 3,
       "dealSeed": 35265,
-      "bottles": 28
+      "bottles": 32
     },
     "37.png": {
       "name": "Apple",
@@ -443,7 +443,7 @@
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 36242,
-      "bottles": 24
+      "bottles": 35
     },
     "38.png": {
       "name": "Balloon",
@@ -455,7 +455,7 @@
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 37219,
-      "bottles": 31
+      "bottles": 35
     },
     "39.png": {
       "name": "Diamond",
@@ -467,7 +467,7 @@
       "churn": 0.42,
       "shuffleWindow": 3,
       "dealSeed": 38196,
-      "bottles": 28
+      "bottles": 31
     },
     "40.png": {
       "name": "Balloon",
@@ -479,31 +479,31 @@
       "churn": 0.51,
       "shuffleWindow": 5,
       "dealSeed": 39235,
-      "bottles": 44
+      "bottles": 51
     },
     "41.png": {
       "name": "Apple",
       "gridSize": 18,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 324,
       "churn": 0.41,
       "shuffleWindow": 3,
       "dealSeed": 40150,
-      "bottles": 27
+      "bottles": 32
     },
     "42.png": {
       "name": "Balloon",
       "gridSize": 18,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 324,
       "churn": 0.42,
       "shuffleWindow": 3,
       "dealSeed": 41127,
-      "bottles": 28
+      "bottles": 32
     },
     "43.png": {
       "name": "Heart",
@@ -515,19 +515,19 @@
       "churn": 0.4,
       "shuffleWindow": 3,
       "dealSeed": 42104,
-      "bottles": 29
+      "bottles": 31
     },
     "44.png": {
       "name": "Star",
       "gridSize": 19,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 361,
       "churn": 0.45,
       "shuffleWindow": 3,
       "dealSeed": 43081,
-      "bottles": 32
+      "bottles": 37
     },
     "45.png": {
       "name": "Heart",
@@ -539,7 +539,7 @@
       "churn": 0.43,
       "shuffleWindow": 5,
       "dealSeed": 44120,
-      "bottles": 45
+      "bottles": 51
     },
     "46.png": {
       "name": "Heart",
@@ -551,19 +551,19 @@
       "churn": 0.39,
       "shuffleWindow": 3,
       "dealSeed": 45035,
-      "bottles": 28
+      "bottles": 35
     },
     "47.png": {
       "name": "Star",
       "gridSize": 19,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 361,
       "churn": 0.39,
       "shuffleWindow": 3,
       "dealSeed": 46012,
-      "bottles": 31
+      "bottles": 35
     },
     "48.png": {
       "name": "Star",
@@ -575,7 +575,7 @@
       "churn": 0.38,
       "shuffleWindow": 3,
       "dealSeed": 46989,
-      "bottles": 34
+      "bottles": 38
     },
     "49.png": {
       "name": "Sun",
@@ -587,7 +587,7 @@
       "churn": 0.37,
       "shuffleWindow": 3,
       "dealSeed": 47966,
-      "bottles": 32
+      "bottles": 41
     },
     "50.png": {
       "name": "Sun",
@@ -599,19 +599,19 @@
       "churn": 0.5,
       "shuffleWindow": 5,
       "dealSeed": 49005,
-      "bottles": 45
+      "bottles": 52
     },
     "51.png": {
       "name": "Sun",
       "gridSize": 19,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 361,
       "churn": 0.47,
       "shuffleWindow": 3,
       "dealSeed": 49920,
-      "bottles": 34
+      "bottles": 38
     },
     "52.png": {
       "name": "Balloon",
@@ -623,7 +623,7 @@
       "churn": 0.45,
       "shuffleWindow": 3,
       "dealSeed": 50897,
-      "bottles": 34
+      "bottles": 38
     },
     "53.png": {
       "name": "Apple",
@@ -635,31 +635,31 @@
       "churn": 0.43,
       "shuffleWindow": 3,
       "dealSeed": 51874,
-      "bottles": 32
+      "bottles": 36
     },
     "54.png": {
       "name": "Sun",
       "gridSize": 19,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 361,
       "churn": 0.42,
       "shuffleWindow": 3,
       "dealSeed": 52851,
-      "bottles": 31
+      "bottles": 40
     },
     "55.png": {
       "name": "Sun",
       "gridSize": 23,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 529,
       "churn": 0.54,
       "shuffleWindow": 5,
       "dealSeed": 53890,
-      "bottles": 48
+      "bottles": 52
     },
     "56.png": {
       "name": "Balloon",
@@ -671,31 +671,31 @@
       "churn": 0.36,
       "shuffleWindow": 3,
       "dealSeed": 54805,
-      "bottles": 29
+      "bottles": 36
     },
     "57.png": {
       "name": "Balloon",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.41,
       "shuffleWindow": 3,
       "dealSeed": 55782,
-      "bottles": 35
+      "bottles": 40
     },
     "58.png": {
       "name": "Balloon",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.41,
       "shuffleWindow": 3,
       "dealSeed": 56759,
-      "bottles": 32
+      "bottles": 41
     },
     "59.png": {
       "name": "Balloon",
@@ -707,38 +707,38 @@
       "churn": 0.42,
       "shuffleWindow": 3,
       "dealSeed": 57736,
-      "bottles": 27
+      "bottles": 37
     },
     "60.png": {
       "name": "Diamond",
       "gridSize": 24,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 576,
       "churn": 0.49,
       "shuffleWindow": 5,
       "dealSeed": 58775,
-      "bottles": 54
+      "bottles": 50
     },
     "61.png": {
       "name": "Sun",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.44,
       "shuffleWindow": 3,
       "dealSeed": 59690,
-      "bottles": 30
+      "bottles": 40
     },
     "62.png": {
       "name": "Heart",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.4,
       "shuffleWindow": 3,
@@ -750,12 +750,12 @@
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.39,
       "shuffleWindow": 3,
       "dealSeed": 61644,
-      "bottles": 35
+      "bottles": 37
     },
     "64.png": {
       "name": "Star",
@@ -767,7 +767,7 @@
       "churn": 0.4,
       "shuffleWindow": 3,
       "dealSeed": 62621,
-      "bottles": 34
+      "bottles": 42
     },
     "65.png": {
       "name": "Star",
@@ -779,55 +779,55 @@
       "churn": 0.5,
       "shuffleWindow": 6,
       "dealSeed": 63691,
-      "bottles": 50
+      "bottles": 56
     },
     "66.png": {
       "name": "Diamond",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 64606,
-      "bottles": 37
+      "bottles": 41
     },
     "67.png": {
       "name": "Apple",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 400,
       "churn": 0.42,
       "shuffleWindow": 4,
       "dealSeed": 65583,
-      "bottles": 31
+      "bottles": 41
     },
     "68.png": {
       "name": "Heart",
       "gridSize": 20,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 4,
       "cells": 400,
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 66560,
-      "bottles": 35
+      "bottles": 36
     },
     "69.png": {
       "name": "Heart",
       "gridSize": 21,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 441,
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 75456,
-      "bottles": 39
+      "bottles": 44
     },
     "70.png": {
       "name": "Apple",
@@ -839,7 +839,7 @@
       "churn": 0.55,
       "shuffleWindow": 6,
       "dealSeed": 68576,
-      "bottles": 56
+      "bottles": 59
     },
     "71.png": {
       "name": "Balloon",
@@ -851,7 +851,7 @@
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 69491,
-      "bottles": 35
+      "bottles": 47
     },
     "72.png": {
       "name": "Apple",
@@ -863,19 +863,19 @@
       "churn": 0.42,
       "shuffleWindow": 4,
       "dealSeed": 70468,
-      "bottles": 33
+      "bottles": 40
     },
     "73.png": {
       "name": "Star",
       "gridSize": 21,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 441,
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 71445,
-      "bottles": 34
+      "bottles": 41
     },
     "74.png": {
       "name": "Star",
@@ -887,19 +887,19 @@
       "churn": 0.38,
       "shuffleWindow": 4,
       "dealSeed": 72422,
-      "bottles": 33
+      "bottles": 44
     },
     "75.png": {
       "name": "Sun",
       "gridSize": 25,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 625,
       "churn": 0.51,
       "shuffleWindow": 6,
       "dealSeed": 73461,
-      "bottles": 53
+      "bottles": 64
     },
     "76.png": {
       "name": "Apple",
@@ -911,7 +911,7 @@
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 74376,
-      "bottles": 31
+      "bottles": 45
     },
     "77.png": {
       "name": "Apple",
@@ -923,38 +923,38 @@
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 75353,
-      "bottles": 33
+      "bottles": 45
     },
     "78.png": {
       "name": "Balloon",
       "gridSize": 21,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 441,
       "churn": 0.42,
       "shuffleWindow": 4,
       "dealSeed": 76330,
-      "bottles": 42
+      "bottles": 44
     },
     "79.png": {
       "name": "Sun",
       "gridSize": 21,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 441,
       "churn": 0.42,
       "shuffleWindow": 4,
       "dealSeed": 77307,
-      "bottles": 34
+      "bottles": 46
     },
     "80.png": {
       "name": "Apple",
       "gridSize": 25,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 625,
       "churn": 0.52,
       "shuffleWindow": 6,
@@ -971,19 +971,19 @@
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 79261,
-      "bottles": 39
+      "bottles": 42
     },
     "82.png": {
       "name": "Sun",
       "gridSize": 22,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 484,
       "churn": 0.44,
       "shuffleWindow": 4,
       "dealSeed": 80238,
-      "bottles": 38
+      "bottles": 46
     },
     "83.png": {
       "name": "Star",
@@ -995,7 +995,7 @@
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 81215,
-      "bottles": 38
+      "bottles": 49
     },
     "84.png": {
       "name": "Apple",
@@ -1007,31 +1007,31 @@
       "churn": 0.43,
       "shuffleWindow": 4,
       "dealSeed": 82192,
-      "bottles": 38
+      "bottles": 49
     },
     "85.png": {
       "name": "Sun",
       "gridSize": 25,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 625,
       "churn": 0.53,
       "shuffleWindow": 6,
       "dealSeed": 83231,
-      "bottles": 56
+      "bottles": 55
     },
     "86.png": {
       "name": "Moon",
       "gridSize": 22,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 484,
       "churn": 0.45,
       "shuffleWindow": 4,
       "dealSeed": 84146,
-      "bottles": 45
+      "bottles": 51
     },
     "87.png": {
       "name": "Star",
@@ -1043,19 +1043,19 @@
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 85123,
-      "bottles": 44
+      "bottles": 49
     },
     "88.png": {
       "name": "Ghost",
       "gridSize": 22,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 484,
       "churn": 0.39,
       "shuffleWindow": 4,
       "dealSeed": 86100,
-      "bottles": 35
+      "bottles": 49
     },
     "89.png": {
       "name": "Sun",
@@ -1067,31 +1067,31 @@
       "churn": 0.42,
       "shuffleWindow": 4,
       "dealSeed": 87077,
-      "bottles": 38
+      "bottles": 50
     },
     "90.png": {
       "name": "Heart",
       "gridSize": 26,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 676,
       "churn": 0.51,
       "shuffleWindow": 6,
       "dealSeed": 96035,
-      "bottles": 58
+      "bottles": 63
     },
     "91.png": {
       "name": "Ghost",
       "gridSize": 22,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 484,
       "churn": 0.45,
       "shuffleWindow": 4,
       "dealSeed": 89031,
-      "bottles": 35
+      "bottles": 45
     },
     "92.png": {
       "name": "Apple",
@@ -1103,14 +1103,14 @@
       "churn": 0.43,
       "shuffleWindow": 4,
       "dealSeed": 90008,
-      "bottles": 36
+      "bottles": 53
     },
     "93.png": {
       "name": "Heart",
       "gridSize": 22,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 484,
       "churn": 0.42,
       "shuffleWindow": 4,
@@ -1122,24 +1122,24 @@
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.38,
       "shuffleWindow": 4,
       "dealSeed": 91962,
-      "bottles": 42
+      "bottles": 48
     },
     "95.png": {
       "name": "Apple",
       "gridSize": 26,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 676,
       "churn": 0.52,
       "shuffleWindow": 6,
       "dealSeed": 93001,
-      "bottles": 60
+      "bottles": 62
     },
     "96.png": {
       "name": "Crown",
@@ -1151,7 +1151,7 @@
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 93916,
-      "bottles": 51
+      "bottles": 54
     },
     "97.png": {
       "name": "Sun",
@@ -1163,7 +1163,7 @@
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 94893,
-      "bottles": 43
+      "bottles": 53
     },
     "98.png": {
       "name": "Bloom",
@@ -1175,67 +1175,67 @@
       "churn": 0.41,
       "shuffleWindow": 4,
       "dealSeed": 95870,
-      "bottles": 43
+      "bottles": 57
     },
     "99.png": {
       "name": "Balloon",
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 96847,
-      "bottles": 44
+      "bottles": 45
     },
     "100.png": {
       "name": "Moon",
       "gridSize": 26,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 676,
       "churn": 0.53,
       "shuffleWindow": 7,
       "dealSeed": 97917,
-      "bottles": 57
+      "bottles": 68
     },
     "101.png": {
       "name": "Sun",
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.45,
       "shuffleWindow": 4,
       "dealSeed": 98801,
-      "bottles": 45
+      "bottles": 53
     },
     "102.png": {
       "name": "Bloom",
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.4,
       "shuffleWindow": 4,
       "dealSeed": 99778,
-      "bottles": 39
+      "bottles": 50
     },
     "103.png": {
       "name": "Ghost",
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.39,
       "shuffleWindow": 4,
       "dealSeed": 755,
-      "bottles": 40
+      "bottles": 51
     },
     "104.png": {
       "name": "Diamond",
@@ -1247,43 +1247,43 @@
       "churn": 0.38,
       "shuffleWindow": 4,
       "dealSeed": 1732,
-      "bottles": 45
+      "bottles": 51
     },
     "105.png": {
       "name": "Bloom",
       "gridSize": 27,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 729,
       "churn": 0.52,
       "shuffleWindow": 7,
       "dealSeed": 2802,
-      "bottles": 57
+      "bottles": 71
     },
     "106.png": {
       "name": "Bloom",
       "gridSize": 23,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 529,
       "churn": 0.39,
       "shuffleWindow": 4,
       "dealSeed": 3686,
-      "bottles": 41
+      "bottles": 50
     },
     "107.png": {
       "name": "Star",
       "gridSize": 24,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 576,
       "churn": 0.46,
       "shuffleWindow": 4,
       "dealSeed": 4663,
-      "bottles": 39
+      "bottles": 59
     },
     "108.png": {
       "name": "Ghost",
@@ -1295,7 +1295,7 @@
       "churn": 0.46,
       "shuffleWindow": 5,
       "dealSeed": 5671,
-      "bottles": 42
+      "bottles": 54
     },
     "109.png": {
       "name": "Crown",
@@ -1307,7 +1307,7 @@
       "churn": 0.38,
       "shuffleWindow": 5,
       "dealSeed": 6648,
-      "bottles": 45
+      "bottles": 55
     },
     "110.png": {
       "name": "Pine",
@@ -1319,7 +1319,7 @@
       "churn": 0.5,
       "shuffleWindow": 7,
       "dealSeed": 7687,
-      "bottles": 56
+      "bottles": 70
     },
     "111.png": {
       "name": "Pine",
@@ -1331,7 +1331,7 @@
       "churn": 0.38,
       "shuffleWindow": 5,
       "dealSeed": 8602,
-      "bottles": 50
+      "bottles": 56
     },
     "112.png": {
       "name": "Balloon",
@@ -1343,7 +1343,7 @@
       "churn": 0.41,
       "shuffleWindow": 5,
       "dealSeed": 9579,
-      "bottles": 47
+      "bottles": 59
     },
     "113.png": {
       "name": "Pine",
@@ -1354,8 +1354,8 @@
       "cells": 576,
       "churn": 0.4,
       "shuffleWindow": 5,
-      "dealSeed": 10556,
-      "bottles": 42
+      "dealSeed": 26394,
+      "bottles": 54
     },
     "114.png": {
       "name": "Balloon",
@@ -1367,31 +1367,31 @@
       "churn": 0.55,
       "shuffleWindow": 5,
       "dealSeed": 11533,
-      "bottles": 43
+      "bottles": 53
     },
     "115.png": {
       "name": "Balloon",
       "gridSize": 27,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 5,
       "cells": 729,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 12572,
-      "bottles": 54
+      "bottles": 62
     },
     "116.png": {
       "name": "Diamond",
       "gridSize": 24,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 576,
       "churn": 0.48,
       "shuffleWindow": 5,
       "dealSeed": 13487,
-      "bottles": 45
+      "bottles": 55
     },
     "117.png": {
       "name": "Moon",
@@ -1403,19 +1403,19 @@
       "churn": 0.51,
       "shuffleWindow": 5,
       "dealSeed": 14464,
-      "bottles": 40
+      "bottles": 56
     },
     "118.png": {
       "name": "Diamond",
       "gridSize": 24,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 576,
       "churn": 0.53,
       "shuffleWindow": 5,
       "dealSeed": 15441,
-      "bottles": 48
+      "bottles": 56
     },
     "119.png": {
       "name": "Pine",
@@ -1427,103 +1427,103 @@
       "churn": 0.46,
       "shuffleWindow": 5,
       "dealSeed": 16418,
-      "bottles": 48
+      "bottles": 64
     },
     "120.png": {
       "name": "Pine",
-      "gridSize": 28,
+      "gridSize": 27,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
-      "cells": 784,
+      "colors": 7,
+      "cells": 729,
       "churn": 0.48,
       "shuffleWindow": 7,
       "dealSeed": 17457,
-      "bottles": 59
+      "bottles": 72
     },
     "121.png": {
       "name": "Crown",
       "gridSize": 25,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 625,
       "churn": 0.42,
       "shuffleWindow": 5,
       "dealSeed": 18372,
-      "bottles": 52
+      "bottles": 61
     },
     "122.png": {
       "name": "Shroom",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 625,
       "churn": 0.45,
       "shuffleWindow": 5,
       "dealSeed": 19349,
-      "bottles": 51
+      "bottles": 58
     },
     "123.png": {
       "name": "Shroom",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 625,
       "churn": 0.45,
       "shuffleWindow": 5,
       "dealSeed": 20326,
-      "bottles": 47
+      "bottles": 58
     },
     "124.png": {
       "name": "Balloon",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 625,
       "churn": 0.45,
       "shuffleWindow": 5,
       "dealSeed": 21303,
-      "bottles": 49
+      "bottles": 57
     },
     "125.png": {
       "name": "Star",
       "gridSize": 28,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 784,
       "churn": 0.57,
       "shuffleWindow": 7,
       "dealSeed": 22342,
-      "bottles": 55
+      "bottles": 75
     },
     "126.png": {
       "name": "Shroom",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 625,
       "churn": 0.45,
       "shuffleWindow": 5,
       "dealSeed": 23257,
-      "bottles": 52
+      "bottles": 61
     },
     "127.png": {
       "name": "Moon",
       "gridSize": 25,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 625,
       "churn": 0.43,
       "shuffleWindow": 5,
       "dealSeed": 24234,
-      "bottles": 58
+      "bottles": 64
     },
     "128.png": {
       "name": "Heart",
@@ -1534,56 +1534,56 @@
       "cells": 625,
       "churn": 0.47,
       "shuffleWindow": 5,
-      "dealSeed": 25211,
-      "bottles": 50
+      "dealSeed": 33130,
+      "bottles": 60
     },
     "129.png": {
       "name": "Bloom",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 625,
       "churn": 0.43,
       "shuffleWindow": 5,
       "dealSeed": 26188,
-      "bottles": 48
+      "bottles": 58
     },
     "130.png": {
       "name": "Star",
-      "gridSize": 28,
-      "maxColors": 8,
+      "gridSize": 26,
+      "maxColors": 6,
       "hard": true,
-      "colors": 8,
-      "cells": 784,
+      "colors": 6,
+      "cells": 676,
       "churn": 0.53,
       "shuffleWindow": 7,
       "dealSeed": 27227,
-      "bottles": 55
+      "bottles": 64
     },
     "131.png": {
       "name": "Shroom",
       "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 625,
       "churn": 0.45,
       "shuffleWindow": 5,
       "dealSeed": 28142,
-      "bottles": 51
+      "bottles": 57
     },
     "132.png": {
       "name": "Star",
-      "gridSize": 26,
+      "gridSize": 25,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
-      "cells": 676,
+      "colors": 6,
+      "cells": 625,
       "churn": 0.48,
       "shuffleWindow": 5,
       "dealSeed": 29119,
-      "bottles": 48
+      "bottles": 62
     },
     "133.png": {
       "name": "Moon",
@@ -1595,31 +1595,31 @@
       "churn": 0.5,
       "shuffleWindow": 5,
       "dealSeed": 30096,
-      "bottles": 51
+      "bottles": 66
     },
     "134.png": {
       "name": "Heart",
       "gridSize": 26,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 676,
       "churn": 0.5,
       "shuffleWindow": 5,
       "dealSeed": 31073,
-      "bottles": 52
+      "bottles": 57
     },
     "135.png": {
       "name": "Ghost",
-      "gridSize": 29,
+      "gridSize": 28,
       "maxColors": 8,
       "hard": true,
       "colors": 8,
-      "cells": 841,
+      "cells": 784,
       "churn": 0.48,
       "shuffleWindow": 8,
       "dealSeed": 32143,
-      "bottles": 58
+      "bottles": 77
     },
     "136.png": {
       "name": "Diamond",
@@ -1631,7 +1631,7 @@
       "churn": 0.51,
       "shuffleWindow": 5,
       "dealSeed": 33027,
-      "bottles": 57
+      "bottles": 63
     },
     "137.png": {
       "name": "Crown",
@@ -1643,55 +1643,55 @@
       "churn": 0.49,
       "shuffleWindow": 5,
       "dealSeed": 34004,
-      "bottles": 59
+      "bottles": 63
     },
     "138.png": {
       "name": "Shroom",
       "gridSize": 26,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 676,
       "churn": 0.43,
       "shuffleWindow": 5,
       "dealSeed": 34981,
-      "bottles": 51
+      "bottles": 70
     },
     "139.png": {
       "name": "Moon",
       "gridSize": 26,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 676,
       "churn": 0.5,
       "shuffleWindow": 5,
-      "dealSeed": 35958,
-      "bottles": 50
+      "dealSeed": 99310,
+      "bottles": 69
     },
     "140.png": {
       "name": "Bloom",
       "gridSize": 29,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 841,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 37028,
-      "bottles": 67
+      "bottles": 79
     },
     "141.png": {
       "name": "Diamond",
       "gridSize": 26,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 676,
       "churn": 0.48,
       "shuffleWindow": 5,
       "dealSeed": 37912,
-      "bottles": 54
+      "bottles": 62
     },
     "142.png": {
       "name": "Bloom",
@@ -1703,67 +1703,67 @@
       "churn": 0.48,
       "shuffleWindow": 1,
       "dealSeed": 38765,
-      "bottles": 52
+      "bottles": 72
     },
     "143.png": {
       "name": "Star",
       "gridSize": 26,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 676,
       "churn": 0.52,
       "shuffleWindow": 5,
       "dealSeed": 39866,
-      "bottles": 50
+      "bottles": 62
     },
     "144.png": {
       "name": "Apple",
       "gridSize": 27,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 729,
       "churn": 0.54,
       "shuffleWindow": 5,
       "dealSeed": 40843,
-      "bottles": 57
+      "bottles": 68
     },
     "145.png": {
       "name": "Shroom",
       "gridSize": 29,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 7,
       "cells": 841,
       "churn": 0.55,
       "shuffleWindow": 8,
       "dealSeed": 41913,
-      "bottles": 65
+      "bottles": 82
     },
     "146.png": {
       "name": "Moon",
       "gridSize": 27,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 729,
       "churn": 0.49,
       "shuffleWindow": 5,
       "dealSeed": 42797,
-      "bottles": 52
+      "bottles": 71
     },
     "147.png": {
       "name": "Bloom",
       "gridSize": 27,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 729,
       "churn": 0.52,
       "shuffleWindow": 5,
       "dealSeed": 43774,
-      "bottles": 55
+      "bottles": 70
     },
     "148.png": {
       "name": "Diamond",
@@ -1775,7 +1775,7 @@
       "churn": 0.52,
       "shuffleWindow": 5,
       "dealSeed": 44751,
-      "bottles": 54
+      "bottles": 72
     },
     "149.png": {
       "name": "Heart",
@@ -1787,43 +1787,43 @@
       "churn": 0.47,
       "shuffleWindow": 5,
       "dealSeed": 45728,
-      "bottles": 54
+      "bottles": 69
     },
     "150.png": {
       "name": "Balloon",
       "gridSize": 30,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 900,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 46798,
-      "bottles": 63
+      "bottles": 79
     },
     "151.png": {
       "name": "Crown",
       "gridSize": 27,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 729,
       "churn": 0.47,
       "shuffleWindow": 6,
       "dealSeed": 47713,
-      "bottles": 56
+      "bottles": 62
     },
     "152.png": {
       "name": "Heart",
       "gridSize": 27,
-      "maxColors": 7,
+      "maxColors": 5,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 729,
       "churn": 0.45,
       "shuffleWindow": 6,
       "dealSeed": 48690,
-      "bottles": 54
+      "bottles": 65
     },
     "153.png": {
       "name": "Apple",
@@ -1835,7 +1835,7 @@
       "churn": 0.55,
       "shuffleWindow": 6,
       "dealSeed": 49667,
-      "bottles": 56
+      "bottles": 67
     },
     "154.png": {
       "name": "Shroom",
@@ -1847,115 +1847,115 @@
       "churn": 0.55,
       "shuffleWindow": 6,
       "dealSeed": 50644,
-      "bottles": 54
+      "bottles": 80
     },
     "155.png": {
       "name": "Bloom",
-      "gridSize": 30,
+      "gridSize": 29,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
-      "cells": 900,
+      "colors": 7,
+      "cells": 841,
       "churn": 0.59,
       "shuffleWindow": 8,
       "dealSeed": 51683,
-      "bottles": 62
+      "bottles": 75
     },
     "156.png": {
       "name": "Shroom",
       "gridSize": 27,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 729,
       "churn": 0.54,
       "shuffleWindow": 6,
       "dealSeed": 52598,
-      "bottles": 55
+      "bottles": 70
     },
     "157.png": {
       "name": "Crown",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 53575,
-      "bottles": 56
+      "bottles": 77
     },
     "158.png": {
       "name": "Moon",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.52,
       "shuffleWindow": 6,
       "dealSeed": 54552,
-      "bottles": 56
+      "bottles": 71
     },
     "159.png": {
       "name": "Bloom",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.45,
       "shuffleWindow": 6,
       "dealSeed": 55529,
-      "bottles": 62
+      "bottles": 73
     },
     "160.png": {
       "name": "Moon",
       "gridSize": 31,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 961,
       "churn": 0.53,
       "shuffleWindow": 8,
       "dealSeed": 56568,
-      "bottles": 75
+      "bottles": 90
     },
     "161.png": {
       "name": "Diamond",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 57483,
-      "bottles": 54
+      "bottles": 73
     },
     "162.png": {
       "name": "Moon",
       "gridSize": 28,
       "maxColors": 6,
       "hard": false,
-      "colors": 6,
+      "colors": 5,
       "cells": 784,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 58460,
-      "bottles": 58
+      "bottles": 70
     },
     "163.png": {
       "name": "Shroom",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.5,
       "shuffleWindow": 6,
       "dealSeed": 59437,
-      "bottles": 57
+      "bottles": 73
     },
     "164.png": {
       "name": "Star",
@@ -1967,55 +1967,55 @@
       "churn": 0.48,
       "shuffleWindow": 6,
       "dealSeed": 60414,
-      "bottles": 57
+      "bottles": 73
     },
     "165.png": {
       "name": "Heart",
       "gridSize": 31,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 961,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 61453,
-      "bottles": 70
+      "bottles": 90
     },
     "166.png": {
       "name": "Shroom",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.54,
       "shuffleWindow": 6,
       "dealSeed": 62368,
-      "bottles": 54
+      "bottles": 75
     },
     "167.png": {
       "name": "Shroom",
       "gridSize": 28,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.51,
       "shuffleWindow": 6,
       "dealSeed": 63345,
-      "bottles": 55
+      "bottles": 74
     },
     "168.png": {
       "name": "Apple",
       "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 784,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 64322,
-      "bottles": 59
+      "bottles": 69
     },
     "169.png": {
       "name": "Pine",
@@ -2025,45 +2025,45 @@
       "colors": 7,
       "cells": 841,
       "churn": 0.44,
-      "shuffleWindow": 6,
-      "dealSeed": 65299,
-      "bottles": 60
+      "shuffleWindow": 5,
+      "dealSeed": 60296,
+      "bottles": 75
     },
     "170.png": {
       "name": "Pine",
       "gridSize": 31,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 961,
       "churn": 0.57,
       "shuffleWindow": 8,
       "dealSeed": 66338,
-      "bottles": 69
+      "bottles": 85
     },
     "171.png": {
       "name": "Heart",
-      "gridSize": 29,
+      "gridSize": 28,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
-      "cells": 841,
+      "colors": 5,
+      "cells": 784,
       "churn": 0.47,
       "shuffleWindow": 6,
       "dealSeed": 67253,
-      "bottles": 60
+      "bottles": 75
     },
     "172.png": {
       "name": "Heart",
       "gridSize": 29,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 841,
       "churn": 0.47,
       "shuffleWindow": 6,
       "dealSeed": 68230,
-      "bottles": 60
+      "bottles": 77
     },
     "173.png": {
       "name": "Moon",
@@ -2075,43 +2075,43 @@
       "churn": 0.52,
       "shuffleWindow": 6,
       "dealSeed": 69207,
-      "bottles": 53
+      "bottles": 76
     },
     "174.png": {
       "name": "Bloom",
       "gridSize": 29,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 841,
       "churn": 0.47,
       "shuffleWindow": 6,
       "dealSeed": 70184,
-      "bottles": 60
+      "bottles": 78
     },
     "175.png": {
       "name": "Balloon",
       "gridSize": 32,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1024,
       "churn": 0.58,
       "shuffleWindow": 9,
       "dealSeed": 71254,
-      "bottles": 85
+      "bottles": 99
     },
     "176.png": {
       "name": "Moon",
       "gridSize": 29,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 841,
       "churn": 0.52,
       "shuffleWindow": 6,
       "dealSeed": 72138,
-      "bottles": 64
+      "bottles": 75
     },
     "177.png": {
       "name": "Star",
@@ -2123,19 +2123,19 @@
       "churn": 0.48,
       "shuffleWindow": 6,
       "dealSeed": 73115,
-      "bottles": 61
+      "bottles": 79
     },
     "178.png": {
       "name": "Star",
       "gridSize": 29,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 841,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 74092,
-      "bottles": 58
+      "bottles": 77
     },
     "179.png": {
       "name": "Apple",
@@ -2147,103 +2147,103 @@
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 75069,
-      "bottles": 58
+      "bottles": 74
     },
     "180.png": {
       "name": "Diamond",
       "gridSize": 32,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.6,
       "shuffleWindow": 9,
       "dealSeed": 84058,
-      "bottles": 79
+      "bottles": 89
     },
     "181.png": {
       "name": "Shroom",
       "gridSize": 29,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 5,
       "cells": 841,
       "churn": 0.49,
       "shuffleWindow": 6,
       "dealSeed": 77023,
-      "bottles": 70
+      "bottles": 79
     },
     "182.png": {
       "name": "Balloon",
       "gridSize": 30,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 900,
       "churn": 0.5,
       "shuffleWindow": 6,
       "dealSeed": 78000,
-      "bottles": 71
+      "bottles": 85
     },
     "183.png": {
       "name": "Shroom",
       "gridSize": 30,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 900,
       "churn": 0.52,
       "shuffleWindow": 6,
       "dealSeed": 78977,
-      "bottles": 60
+      "bottles": 82
     },
     "184.png": {
       "name": "Moon",
       "gridSize": 30,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 900,
       "churn": 0.47,
       "shuffleWindow": 6,
       "dealSeed": 79954,
-      "bottles": 68
+      "bottles": 84
     },
     "185.png": {
       "name": "Bloom",
-      "gridSize": 32,
+      "gridSize": 30,
       "maxColors": 9,
       "hard": true,
       "colors": 9,
-      "cells": 1024,
+      "cells": 900,
       "churn": 0.55,
       "shuffleWindow": 9,
       "dealSeed": 81024,
-      "bottles": 74
+      "bottles": 87
     },
     "186.png": {
       "name": "Diamond",
       "gridSize": 30,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 900,
       "churn": 0.53,
       "shuffleWindow": 6,
       "dealSeed": 81908,
-      "bottles": 73
+      "bottles": 85
     },
     "187.png": {
       "name": "Bloom",
       "gridSize": 30,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 900,
       "churn": 0.46,
       "shuffleWindow": 6,
       "dealSeed": 82885,
-      "bottles": 60
+      "bottles": 78
     },
     "188.png": {
       "name": "Rocket",
@@ -2255,43 +2255,43 @@
       "churn": 0.54,
       "shuffleWindow": 6,
       "dealSeed": 91781,
-      "bottles": 61
+      "bottles": 81
     },
     "189.png": {
       "name": "Diamond",
       "gridSize": 30,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 900,
       "churn": 0.46,
       "shuffleWindow": 6,
       "dealSeed": 84839,
-      "bottles": 66
+      "bottles": 87
     },
     "190.png": {
       "name": "Bloom",
       "gridSize": 33,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1089,
       "churn": 0.57,
       "shuffleWindow": 9,
       "dealSeed": 85909,
-      "bottles": 74
+      "bottles": 103
     },
     "191.png": {
       "name": "Shroom",
-      "gridSize": 30,
+      "gridSize": 28,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
-      "cells": 900,
+      "colors": 6,
+      "cells": 784,
       "churn": 0.54,
       "shuffleWindow": 6,
       "dealSeed": 86793,
-      "bottles": 73
+      "bottles": 76
     },
     "192.png": {
       "name": "Moon",
@@ -2303,79 +2303,79 @@
       "churn": 0.46,
       "shuffleWindow": 6,
       "dealSeed": 87770,
-      "bottles": 64
+      "bottles": 82
     },
     "193.png": {
       "name": "Shroom",
-      "gridSize": 30,
+      "gridSize": 28,
       "maxColors": 8,
       "hard": false,
       "colors": 8,
-      "cells": 900,
+      "cells": 784,
       "churn": 0.46,
       "shuffleWindow": 7,
       "dealSeed": 88778,
-      "bottles": 62
+      "bottles": 74
     },
     "194.png": {
       "name": "Kitty",
       "gridSize": 31,
-      "maxColors": 8,
+      "maxColors": 7,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.5,
       "shuffleWindow": 7,
       "dealSeed": 89755,
-      "bottles": 63
+      "bottles": 87
     },
     "195.png": {
       "name": "Rocket",
       "gridSize": 33,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1089,
       "churn": 0.62,
       "shuffleWindow": 9,
       "dealSeed": 90794,
-      "bottles": 84
+      "bottles": 95
     },
     "196.png": {
       "name": "Bloom",
       "gridSize": 31,
-      "maxColors": 8,
+      "maxColors": 7,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.46,
       "shuffleWindow": 7,
       "dealSeed": 91709,
-      "bottles": 69
+      "bottles": 89
     },
     "197.png": {
       "name": "Fish",
       "gridSize": 31,
-      "maxColors": 8,
+      "maxColors": 7,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 92686,
-      "bottles": 66
+      "bottles": 90
     },
     "198.png": {
       "name": "Ghost",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.52,
       "shuffleWindow": 7,
       "dealSeed": 93663,
-      "bottles": 67
+      "bottles": 88
     },
     "199.png": {
       "name": "Crown",
@@ -2387,91 +2387,91 @@
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 94640,
-      "bottles": 71
+      "bottles": 91
     },
     "200.png": {
       "name": "Fish",
       "gridSize": 33,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 1089,
       "churn": 0.61,
       "shuffleWindow": 9,
       "dealSeed": 95679,
-      "bottles": 81
+      "bottles": 95
     },
     "201.png": {
       "name": "House",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 96594,
-      "bottles": 68
+      "bottles": 89
     },
     "202.png": {
       "name": "Kitty",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 97571,
-      "bottles": 72
+      "bottles": 91
     },
     "203.png": {
       "name": "Flutter",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.5,
       "shuffleWindow": 7,
       "dealSeed": 98548,
-      "bottles": 68
+      "bottles": 88
     },
     "204.png": {
       "name": "Star",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 961,
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 99525,
-      "bottles": 69
+      "bottles": 87
     },
     "205.png": {
       "name": "Kitty",
       "gridSize": 34,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.54,
       "shuffleWindow": 9,
       "dealSeed": 564,
-      "bottles": 82
+      "bottles": 112
     },
     "206.png": {
       "name": "Star",
       "gridSize": 31,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 961,
       "churn": 0.48,
       "shuffleWindow": 7,
       "dealSeed": 1479,
-      "bottles": 65
+      "bottles": 91
     },
     "207.png": {
       "name": "Apple",
@@ -2483,79 +2483,79 @@
       "churn": 0.47,
       "shuffleWindow": 7,
       "dealSeed": 2456,
-      "bottles": 74
+      "bottles": 101
     },
     "208.png": {
       "name": "Ghost",
       "gridSize": 32,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1024,
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 3433,
-      "bottles": 71
+      "bottles": 92
     },
     "209.png": {
       "name": "Balloon",
       "gridSize": 32,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.5,
       "shuffleWindow": 7,
       "dealSeed": 4410,
-      "bottles": 83
+      "bottles": 97
     },
     "210.png": {
       "name": "House",
       "gridSize": 34,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1156,
       "churn": 0.54,
       "shuffleWindow": 10,
       "dealSeed": 5480,
-      "bottles": 82
+      "bottles": 110
     },
     "211.png": {
       "name": "Kitty",
       "gridSize": 32,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.52,
       "shuffleWindow": 7,
       "dealSeed": 6364,
-      "bottles": 69
+      "bottles": 95
     },
     "212.png": {
       "name": "Shroom",
       "gridSize": 32,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.55,
       "shuffleWindow": 7,
       "dealSeed": 7341,
-      "bottles": 71
+      "bottles": 90
     },
     "213.png": {
       "name": "Moon",
       "gridSize": 32,
-      "maxColors": 8,
+      "maxColors": 6,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1024,
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 8318,
-      "bottles": 74
+      "bottles": 99
     },
     "214.png": {
       "name": "Ghost",
@@ -2567,43 +2567,43 @@
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 9295,
-      "bottles": 76
+      "bottles": 98
     },
     "215.png": {
       "name": "Bloom",
       "gridSize": 34,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.61,
       "shuffleWindow": 10,
       "dealSeed": 10365,
-      "bottles": 88
+      "bottles": 102
     },
     "216.png": {
       "name": "Star",
       "gridSize": 32,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 11249,
-      "bottles": 73
+      "bottles": 93
     },
     "217.png": {
       "name": "Fish",
       "gridSize": 32,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1024,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 12226,
-      "bottles": 71
+      "bottles": 92
     },
     "218.png": {
       "name": "Pine",
@@ -2615,7 +2615,7 @@
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 13203,
-      "bottles": 75
+      "bottles": 102
     },
     "219.png": {
       "name": "Moon",
@@ -2627,31 +2627,31 @@
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 14180,
-      "bottles": 77
+      "bottles": 98
     },
     "220.png": {
       "name": "Apple",
       "gridSize": 35,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.53,
       "shuffleWindow": 10,
       "dealSeed": 23169,
-      "bottles": 87
+      "bottles": 108
     },
     "221.png": {
       "name": "Rocket",
       "gridSize": 33,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1089,
       "churn": 0.44,
       "shuffleWindow": 7,
       "dealSeed": 16134,
-      "bottles": 83
+      "bottles": 102
     },
     "222.png": {
       "name": "Star",
@@ -2663,7 +2663,7 @@
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 17111,
-      "bottles": 76
+      "bottles": 97
     },
     "223.png": {
       "name": "Flutter",
@@ -2675,31 +2675,31 @@
       "churn": 0.49,
       "shuffleWindow": 7,
       "dealSeed": 18088,
-      "bottles": 91
+      "bottles": 100
     },
     "224.png": {
       "name": "Kitty",
       "gridSize": 33,
-      "maxColors": 7,
+      "maxColors": 6,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 1089,
       "churn": 0.46,
       "shuffleWindow": 7,
       "dealSeed": 19065,
-      "bottles": 76
+      "bottles": 98
     },
     "225.png": {
       "name": "Fish",
       "gridSize": 35,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.5,
       "shuffleWindow": 10,
       "dealSeed": 20135,
-      "bottles": 85
+      "bottles": 104
     },
     "226.png": {
       "name": "Kitty",
@@ -2711,91 +2711,91 @@
       "churn": 0.48,
       "shuffleWindow": 7,
       "dealSeed": 21019,
-      "bottles": 83
+      "bottles": 103
     },
     "227.png": {
       "name": "Flutter",
       "gridSize": 33,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1089,
       "churn": 0.47,
       "shuffleWindow": 7,
       "dealSeed": 21996,
-      "bottles": 76
+      "bottles": 99
     },
     "228.png": {
       "name": "Fish",
       "gridSize": 33,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1089,
       "churn": 0.54,
       "shuffleWindow": 7,
       "dealSeed": 22973,
-      "bottles": 77
+      "bottles": 105
     },
     "229.png": {
       "name": "Star",
       "gridSize": 33,
-      "maxColors": 8,
+      "maxColors": 7,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1089,
       "churn": 0.48,
       "shuffleWindow": 7,
       "dealSeed": 23950,
-      "bottles": 79
+      "bottles": 96
     },
     "230.png": {
       "name": "Rocket",
-      "gridSize": 35,
+      "gridSize": 34,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
-      "cells": 1225,
+      "colors": 6,
+      "cells": 1156,
       "churn": 0.57,
       "shuffleWindow": 10,
       "dealSeed": 25020,
-      "bottles": 82
+      "bottles": 105
     },
     "231.png": {
       "name": "Balloon",
       "gridSize": 33,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1089,
       "churn": 0.46,
       "shuffleWindow": 7,
       "dealSeed": 25904,
-      "bottles": 85
+      "bottles": 97
     },
     "232.png": {
       "name": "Rocket",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.48,
       "shuffleWindow": 7,
       "dealSeed": 26881,
-      "bottles": 80
+      "bottles": 112
     },
     "233.png": {
       "name": "Shroom",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1156,
       "churn": 0.51,
       "shuffleWindow": 7,
       "dealSeed": 27858,
-      "bottles": 83
+      "bottles": 108
     },
     "234.png": {
       "name": "Shroom",
@@ -2807,31 +2807,31 @@
       "churn": 0.52,
       "shuffleWindow": 7,
       "dealSeed": 28835,
-      "bottles": 76
+      "bottles": 109
     },
     "235.png": {
       "name": "Balloon",
       "gridSize": 36,
       "maxColors": 6,
       "hard": true,
-      "colors": 6,
+      "colors": 5,
       "cells": 1296,
       "churn": 0.59,
       "shuffleWindow": 10,
       "dealSeed": 29905,
-      "bottles": 78
+      "bottles": 117
     },
     "236.png": {
       "name": "Ghost",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.5,
       "shuffleWindow": 8,
       "dealSeed": 30820,
-      "bottles": 78
+      "bottles": 111
     },
     "237.png": {
       "name": "Star",
@@ -2843,211 +2843,211 @@
       "churn": 0.48,
       "shuffleWindow": 8,
       "dealSeed": 31797,
-      "bottles": 73
+      "bottles": 114
     },
     "238.png": {
       "name": "Crown",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.5,
       "shuffleWindow": 8,
       "dealSeed": 32774,
-      "bottles": 83
+      "bottles": 107
     },
     "239.png": {
       "name": "Sun",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1156,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 33751,
-      "bottles": 76
+      "bottles": 107
     },
     "240.png": {
       "name": "Balloon",
       "gridSize": 36,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
+      "colors": 6,
       "cells": 1296,
       "churn": 0.56,
       "shuffleWindow": 10,
       "dealSeed": 34790,
-      "bottles": 82
+      "bottles": 114
     },
     "241.png": {
       "name": "Fish",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.45,
       "shuffleWindow": 8,
       "dealSeed": 35705,
-      "bottles": 76
+      "bottles": 107
     },
     "242.png": {
       "name": "Fish",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1156,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 36682,
-      "bottles": 83
+      "bottles": 108
     },
     "243.png": {
       "name": "Star",
       "gridSize": 34,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1156,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 37659,
-      "bottles": 77
+      "bottles": 102
     },
     "244.png": {
       "name": "Heart",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.4,
       "shuffleWindow": 8,
       "dealSeed": 38636,
-      "bottles": 83
+      "bottles": 113
     },
     "245.png": {
       "name": "Heart",
-      "gridSize": 36,
+      "gridSize": 35,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
-      "cells": 1296,
+      "colors": 7,
+      "cells": 1225,
       "churn": 0.61,
       "shuffleWindow": 11,
       "dealSeed": 39706,
-      "bottles": 87
+      "bottles": 117
     },
     "246.png": {
       "name": "House",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 5,
       "cells": 1225,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 40590,
-      "bottles": 95
+      "bottles": 111
     },
     "247.png": {
       "name": "Star",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1225,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 41567,
-      "bottles": 81
+      "bottles": 105
     },
     "248.png": {
       "name": "Bloom",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.43,
       "shuffleWindow": 8,
       "dealSeed": 42544,
-      "bottles": 92
+      "bottles": 111
     },
     "249.png": {
       "name": "Kitty",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 43521,
-      "bottles": 85
+      "bottles": 115
     },
     "250.png": {
       "name": "Heart",
       "gridSize": 37,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 7,
       "cells": 1369,
       "churn": 0.64,
       "shuffleWindow": 11,
       "dealSeed": 44591,
-      "bottles": 78
+      "bottles": 124
     },
     "251.png": {
       "name": "Balloon",
       "gridSize": 35,
       "maxColors": 7,
       "hard": false,
-      "colors": 7,
+      "colors": 6,
       "cells": 1225,
       "churn": 0.42,
       "shuffleWindow": 8,
       "dealSeed": 45475,
-      "bottles": 96
+      "bottles": 112
     },
     "252.png": {
       "name": "Star",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1225,
       "churn": 0.52,
       "shuffleWindow": 8,
       "dealSeed": 46452,
-      "bottles": 86
+      "bottles": 114
     },
     "253.png": {
       "name": "Apple",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1225,
       "churn": 0.47,
       "shuffleWindow": 8,
       "dealSeed": 47429,
-      "bottles": 82
+      "bottles": 113
     },
     "254.png": {
       "name": "Heart",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1225,
       "churn": 0.49,
       "shuffleWindow": 8,
       "dealSeed": 48406,
-      "bottles": 87
+      "bottles": 109
     },
     "255.png": {
       "name": "Crown",
@@ -3059,31 +3059,31 @@
       "churn": 0.66,
       "shuffleWindow": 11,
       "dealSeed": 49476,
-      "bottles": 86
+      "bottles": 129
     },
     "256.png": {
       "name": "Moon",
       "gridSize": 35,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1225,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 50360,
-      "bottles": 88
+      "bottles": 110
     },
     "257.png": {
       "name": "Rocket",
       "gridSize": 36,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1296,
       "churn": 0.52,
       "shuffleWindow": 8,
       "dealSeed": 51337,
-      "bottles": 96
+      "bottles": 113
     },
     "258.png": {
       "name": "Apple",
@@ -3095,43 +3095,43 @@
       "churn": 0.45,
       "shuffleWindow": 8,
       "dealSeed": 52314,
-      "bottles": 90
+      "bottles": 127
     },
     "259.png": {
       "name": "Flutter",
       "gridSize": 36,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 6,
       "cells": 1296,
       "churn": 0.49,
       "shuffleWindow": 8,
       "dealSeed": 53291,
-      "bottles": 95
+      "bottles": 116
     },
     "260.png": {
       "name": "Flutter",
       "gridSize": 37,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 1369,
       "churn": 0.69,
       "shuffleWindow": 11,
       "dealSeed": 62280,
-      "bottles": 87
+      "bottles": 123
     },
     "261.png": {
       "name": "Crown",
       "gridSize": 36,
       "maxColors": 8,
       "hard": false,
-      "colors": 8,
+      "colors": 7,
       "cells": 1296,
       "churn": 0.5,
       "shuffleWindow": 8,
       "dealSeed": 55245,
-      "bottles": 92
+      "bottles": 114
     },
     "262.png": {
       "name": "Fish",
@@ -3143,19 +3143,19 @@
       "churn": 0.44,
       "shuffleWindow": 8,
       "dealSeed": 56222,
-      "bottles": 94
+      "bottles": 121
     },
     "263.png": {
       "name": "Rocket",
-      "gridSize": 36,
+      "gridSize": 33,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
-      "cells": 1296,
+      "colors": 7,
+      "cells": 1089,
       "churn": 0.48,
       "shuffleWindow": 8,
       "dealSeed": 57199,
-      "bottles": 94
+      "bottles": 105
     },
     "264.png": {
       "name": "Apple",
@@ -3167,31 +3167,31 @@
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 58176,
-      "bottles": 102
+      "bottles": 121
     },
     "265.png": {
       "name": "Diamond",
       "gridSize": 38,
-      "maxColors": 9,
+      "maxColors": 8,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1444,
       "churn": 0.56,
       "shuffleWindow": 11,
       "dealSeed": 59246,
-      "bottles": 94
+      "bottles": 135
     },
     "266.png": {
       "name": "Balloon",
       "gridSize": 36,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1296,
       "churn": 0.46,
       "shuffleWindow": 8,
       "dealSeed": 60130,
-      "bottles": 88
+      "bottles": 122
     },
     "267.png": {
       "name": "Fish",
@@ -3203,19 +3203,19 @@
       "churn": 0.46,
       "shuffleWindow": 8,
       "dealSeed": 61107,
-      "bottles": 98
+      "bottles": 121
     },
     "268.png": {
       "name": "House",
-      "gridSize": 36,
-      "maxColors": 9,
+      "gridSize": 35,
+      "maxColors": 7,
       "hard": false,
-      "colors": 9,
-      "cells": 1296,
+      "colors": 7,
+      "cells": 1225,
       "churn": 0.48,
       "shuffleWindow": 8,
       "dealSeed": 62084,
-      "bottles": 90
+      "bottles": 114
     },
     "269.png": {
       "name": "Fish",
@@ -3227,163 +3227,163 @@
       "churn": 0.46,
       "shuffleWindow": 8,
       "dealSeed": 63061,
-      "bottles": 100
+      "bottles": 125
     },
     "270.png": {
       "name": "Rocket",
-      "gridSize": 38,
+      "gridSize": 37,
       "maxColors": 8,
       "hard": true,
-      "colors": 8,
-      "cells": 1444,
+      "colors": 7,
+      "cells": 1369,
       "churn": 0.65,
       "shuffleWindow": 11,
       "dealSeed": 64131,
-      "bottles": 95
+      "bottles": 117
     },
     "271.png": {
       "name": "Rocket",
-      "gridSize": 37,
+      "gridSize": 35,
       "maxColors": 9,
       "hard": false,
       "colors": 9,
-      "cells": 1369,
+      "cells": 1225,
       "churn": 0.55,
       "shuffleWindow": 8,
       "dealSeed": 65015,
-      "bottles": 94
+      "bottles": 113
     },
     "272.png": {
       "name": "Flutter",
       "gridSize": 37,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": false,
-      "colors": 9,
+      "colors": 7,
       "cells": 1369,
       "churn": 0.7,
       "shuffleWindow": 8,
       "dealSeed": 65992,
-      "bottles": 99
+      "bottles": 119
     },
     "273.png": {
       "name": "Apple",
       "gridSize": 37,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1369,
       "churn": 0.51,
       "shuffleWindow": 8,
       "dealSeed": 66969,
-      "bottles": 100
+      "bottles": 129
     },
     "274.png": {
       "name": "Sun",
       "gridSize": 37,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": false,
-      "colors": 9,
+      "colors": 7,
       "cells": 1369,
       "churn": 0.54,
       "shuffleWindow": 8,
       "dealSeed": 67946,
-      "bottles": 98
+      "bottles": 130
     },
     "275.png": {
       "name": "Shroom",
       "gridSize": 38,
       "maxColors": 7,
       "hard": true,
-      "colors": 7,
+      "colors": 6,
       "cells": 1444,
       "churn": 0.63,
       "shuffleWindow": 11,
       "dealSeed": 69016,
-      "bottles": 90
+      "bottles": 123
     },
     "276.png": {
       "name": "Heart",
-      "gridSize": 37,
+      "gridSize": 36,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
-      "cells": 1369,
+      "colors": 8,
+      "cells": 1296,
       "churn": 0.48,
       "shuffleWindow": 8,
-      "dealSeed": 69900,
-      "bottles": 105
+      "dealSeed": 77819,
+      "bottles": 117
     },
     "277.png": {
       "name": "Heart",
-      "gridSize": 37,
+      "gridSize": 35,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
-      "cells": 1369,
+      "colors": 8,
+      "cells": 1225,
       "churn": 0.65,
       "shuffleWindow": 8,
       "dealSeed": 70877,
-      "bottles": 92
+      "bottles": 108
     },
     "278.png": {
       "name": "Diamond",
       "gridSize": 37,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1369,
       "churn": 0.5,
       "shuffleWindow": 9,
       "dealSeed": 79804,
-      "bottles": 110
+      "bottles": 132
     },
     "279.png": {
       "name": "Shroom",
       "gridSize": 37,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1369,
       "churn": 0.54,
       "shuffleWindow": 9,
       "dealSeed": 72862,
-      "bottles": 95
+      "bottles": 125
     },
     "280.png": {
       "name": "Shroom",
       "gridSize": 39,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 6,
       "cells": 1521,
       "churn": 0.59,
       "shuffleWindow": 11,
       "dealSeed": 73901,
-      "bottles": 99
+      "bottles": 145
     },
     "281.png": {
       "name": "Balloon",
-      "gridSize": 37,
+      "gridSize": 35,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
-      "cells": 1369,
+      "colors": 8,
+      "cells": 1225,
       "churn": 0.48,
       "shuffleWindow": 9,
       "dealSeed": 74816,
-      "bottles": 100
+      "bottles": 114
     },
     "282.png": {
       "name": "Balloon",
       "gridSize": 38,
-      "maxColors": 9,
+      "maxColors": 8,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1444,
       "churn": 0.71,
       "shuffleWindow": 9,
       "dealSeed": 75793,
-      "bottles": 107
+      "bottles": 132
     },
     "283.png": {
       "name": "Sun",
@@ -3395,187 +3395,187 @@
       "churn": 0.47,
       "shuffleWindow": 9,
       "dealSeed": 76770,
-      "bottles": 90
+      "bottles": 131
     },
     "284.png": {
       "name": "Bloom",
       "gridSize": 38,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1444,
       "churn": 0.47,
       "shuffleWindow": 9,
       "dealSeed": 77747,
-      "bottles": 95
+      "bottles": 129
     },
     "285.png": {
       "name": "Sun",
-      "gridSize": 39,
+      "gridSize": 36,
       "maxColors": 10,
       "hard": true,
-      "colors": 10,
-      "cells": 1521,
+      "colors": 8,
+      "cells": 1296,
       "churn": 0.58,
       "shuffleWindow": 12,
-      "dealSeed": 86736,
-      "bottles": 110
+      "dealSeed": 78817,
+      "bottles": 115
     },
     "286.png": {
       "name": "Bloom",
-      "gridSize": 38,
-      "maxColors": 9,
-      "hard": false,
-      "colors": 9,
-      "cells": 1444,
-      "churn": 0.46,
-      "shuffleWindow": 9,
-      "dealSeed": 79701,
-      "bottles": 97
-    },
-    "287.png": {
-      "name": "House",
       "gridSize": 38,
       "maxColors": 8,
       "hard": false,
       "colors": 8,
       "cells": 1444,
+      "churn": 0.46,
+      "shuffleWindow": 9,
+      "dealSeed": 79701,
+      "bottles": 133
+    },
+    "287.png": {
+      "name": "House",
+      "gridSize": 38,
+      "maxColors": 7,
+      "hard": false,
+      "colors": 7,
+      "cells": 1444,
       "churn": 0.45,
       "shuffleWindow": 9,
       "dealSeed": 80678,
-      "bottles": 100
+      "bottles": 129
     },
     "288.png": {
       "name": "House",
       "gridSize": 38,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1444,
       "churn": 0.5,
       "shuffleWindow": 9,
       "dealSeed": 81655,
-      "bottles": 105
+      "bottles": 132
     },
     "289.png": {
       "name": "Shroom",
       "gridSize": 38,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1444,
       "churn": 0.5,
       "shuffleWindow": 9,
       "dealSeed": 82632,
-      "bottles": 98
+      "bottles": 135
     },
     "290.png": {
       "name": "House",
-      "gridSize": 39,
+      "gridSize": 37,
       "maxColors": 10,
       "hard": true,
-      "colors": 10,
-      "cells": 1521,
+      "colors": 8,
+      "cells": 1369,
       "churn": 0.7,
       "shuffleWindow": 12,
       "dealSeed": 83702,
-      "bottles": 101
+      "bottles": 111
     },
     "291.png": {
       "name": "Rocket",
       "gridSize": 38,
-      "maxColors": 9,
+      "maxColors": 5,
       "hard": false,
-      "colors": 9,
+      "colors": 5,
       "cells": 1444,
       "churn": 0.46,
       "shuffleWindow": 9,
       "dealSeed": 84586,
-      "bottles": 104
+      "bottles": 126
     },
     "292.png": {
       "name": "Flutter",
-      "gridSize": 38,
-      "maxColors": 9,
-      "hard": false,
-      "colors": 9,
-      "cells": 1444,
-      "churn": 0.69,
-      "shuffleWindow": 9,
-      "dealSeed": 85563,
-      "bottles": 102
-    },
-    "293.png": {
-      "name": "Sun",
       "gridSize": 38,
       "maxColors": 7,
       "hard": false,
       "colors": 7,
       "cells": 1444,
+      "churn": 0.69,
+      "shuffleWindow": 9,
+      "dealSeed": 85563,
+      "bottles": 127
+    },
+    "293.png": {
+      "name": "Sun",
+      "gridSize": 38,
+      "maxColors": 5,
+      "hard": false,
+      "colors": 5,
+      "cells": 1444,
       "churn": 0.65,
       "shuffleWindow": 9,
-      "dealSeed": 86540,
-      "bottles": 103
+      "dealSeed": 94459,
+      "bottles": 131
     },
     "294.png": {
       "name": "Flutter",
       "gridSize": 39,
-      "maxColors": 9,
+      "maxColors": 8,
       "hard": false,
-      "colors": 9,
+      "colors": 8,
       "cells": 1521,
       "churn": 0.73,
       "shuffleWindow": 9,
-      "dealSeed": 87517,
-      "bottles": 98
+      "dealSeed": 95436,
+      "bottles": 142
     },
     "295.png": {
       "name": "Balloon",
-      "gridSize": 40,
-      "maxColors": 10,
+      "gridSize": 38,
+      "maxColors": 9,
       "hard": true,
-      "colors": 10,
-      "cells": 1600,
+      "colors": 9,
+      "cells": 1444,
       "churn": 0.76,
       "shuffleWindow": 12,
       "dealSeed": 88587,
-      "bottles": 113
+      "bottles": 130
     },
     "296.png": {
       "name": "Diamond",
       "gridSize": 39,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": false,
-      "colors": 9,
+      "colors": 7,
       "cells": 1521,
       "churn": 0.51,
       "shuffleWindow": 9,
       "dealSeed": 89471,
-      "bottles": 108
+      "bottles": 139
     },
     "297.png": {
       "name": "House",
       "gridSize": 39,
       "maxColors": 9,
       "hard": false,
-      "colors": 9,
+      "colors": 7,
       "cells": 1521,
       "churn": 0.46,
       "shuffleWindow": 9,
       "dealSeed": 98367,
-      "bottles": 105
+      "bottles": 136
     },
     "298.png": {
       "name": "Heart",
       "gridSize": 39,
-      "maxColors": 9,
+      "maxColors": 7,
       "hard": false,
-      "colors": 9,
+      "colors": 7,
       "cells": 1521,
       "churn": 0.49,
       "shuffleWindow": 9,
       "dealSeed": 91425,
-      "bottles": 108
+      "bottles": 140
     },
     "299.png": {
       "name": "Star",
@@ -3587,19 +3587,19 @@
       "churn": 0.52,
       "shuffleWindow": 9,
       "dealSeed": 92402,
-      "bottles": 105
+      "bottles": 140
     },
     "300.png": {
       "name": "Apple",
       "gridSize": 40,
       "maxColors": 9,
       "hard": true,
-      "colors": 9,
+      "colors": 8,
       "cells": 1600,
       "churn": 0.73,
       "shuffleWindow": 12,
       "dealSeed": 93472,
-      "bottles": 107
+      "bottles": 139
     }
   }
 }

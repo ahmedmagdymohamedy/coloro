@@ -55,6 +55,38 @@ const _shotSets = [
   _ShotSet('ios_ipad_13', 2064, 2752, 2, stripAlpha: true),
 ];
 
+/// One AdMob house-ad slot.
+///
+/// These nine sizes are AdMob's fixed image-ad inventory. An image that is
+/// not *exactly* one of them cannot be attached to a house ad at all, so
+/// this list is a hard constraint, not a design preference.
+class _AdSize {
+  const _AdSize(this.w, this.h, this.slot);
+  final int w;
+  final int h;
+  final String slot;
+}
+
+const _adSizes = <_AdSize>[
+  _AdSize(320, 50, 'banner'),
+  _AdSize(320, 100, 'large banner'),
+  _AdSize(300, 250, 'medium rectangle'),
+  _AdSize(468, 60, 'full banner'),
+  _AdSize(728, 90, 'leaderboard'),
+  _AdSize(320, 480, 'interstitial - phone portrait'),
+  _AdSize(480, 320, 'interstitial - phone landscape'),
+  _AdSize(768, 1024, 'interstitial - tablet portrait'),
+  _AdSize(1024, 768, 'interstitial - tablet landscape'),
+];
+
+/// Google Ads App-campaign image assets (marketing/campaigns/google-ads-kit.md
+/// §2.4). AC wants exactly 1.91:1 landscape and 1:1 square; both reuse the
+/// house-ad compositions, which already adapt by aspect.
+const _acSizes = <_AdSize>[
+  _AdSize(1200, 628, 'AC landscape'),
+  _AdSize(1200, 1200, 'AC square'),
+];
+
 /// Signature of the PNG writer `main` hands to [_captureSet].
 typedef _Render = Future<void> Function(
   WidgetTester tester,
@@ -149,6 +181,28 @@ void main() {
   testWidgets('feature graphic', (tester) async {
     if (outDir == null) return;
     await render(tester, 'feature_graphic.png', 1024, 500, _paintFeatureGraphic);
+  });
+
+  testWidgets('house ads', (tester) async {
+    if (outDir == null) return;
+    Directory('$outDir/ads').createSync(recursive: true);
+    for (final ad in _adSizes) {
+      await render(tester, 'ads/ad_${ad.w}x${ad.h}.png', ad.w, ad.h,
+          _paintHouseAd);
+    }
+  });
+
+  testWidgets('app campaign images', (tester) async {
+    if (outDir == null) return;
+    Directory('$outDir/ads').createSync(recursive: true);
+    for (final ad in _acSizes) {
+      await render(tester, 'ads/ac_${ad.w}x${ad.h}.png', ad.w, ad.h,
+          _paintHouseAd);
+    }
+    // End card for the 15s AC videos (§2.4): the hero composition at full
+    // portrait video resolution.
+    await render(
+        tester, 'ads/video_endcard_1080x1920.png', 1080, 1920, _paintHouseAd);
   });
 
   for (final set in _shotSets) {
@@ -802,20 +856,43 @@ void _paintFeatureGraphic(Canvas canvas, Size size) {
   _text(canvas, '300 LEVELS   .   PLAYS OFFLINE', Offset(w * 0.065, h * 0.72),
       size: 24, weight: 650, color: _yellow);
 
-  // Framed mini board so the header shows the actual product.
+  // Framed mini board so the header shows the actual product. The literal
+  // 34/15/32/20 are this graphic's own measurements, passed explicitly so
+  // sharing [_miniBoard] with the house ads cannot shift the store art.
   final side = h * 0.70;
-  final board = Rect.fromLTWH(w - side - 34, (h - side) / 2, side, side);
+  _miniBoard(
+    canvas,
+    Rect.fromLTWH(w - side - 34, (h - side) / 2, side, side),
+    frame: 15,
+    frameRadius: 32,
+    radius: 20,
+  );
+}
+
+/// The signature half-drained board: the top rows are still painted, the
+/// bottom rows have already been drunk away. It is the entire mechanic in
+/// one glance, which is why every piece of marketing art carries it.
+///
+/// [board] is the dark inner panel; the lilac frame is drawn *outside* it,
+/// so the painted footprint is `board.inflate(frame)`. Callers that have a
+/// fixed space to fill must budget for that — see [_boardOuter].
+void _miniBoard(
+  Canvas canvas,
+  Rect board, {
+  required double frame,
+  required double frameRadius,
+  required double radius,
+}) {
   canvas
     ..drawRRect(
-      RRect.fromRectAndRadius(board.inflate(15), const Radius.circular(32)),
+      RRect.fromRectAndRadius(
+          board.inflate(frame), Radius.circular(frameRadius)),
       Paint()..color = const Color(0xFF6C5DA8),
     )
     ..drawRRect(
-      RRect.fromRectAndRadius(board, const Radius.circular(20)),
+      RRect.fromRectAndRadius(board, Radius.circular(radius)),
       Paint()..color = const Color(0xFF150F2C),
     );
-  // Top half still painted, bottom half already drunk away — the whole
-  // mechanic in one glance.
   const art = [
     [0, 1, 1, 0, 1, 1, 0],
     [1, 1, 2, 1, 1, 1, 1],
@@ -915,4 +992,294 @@ void _composeScreenshot(
         ..strokeWidth = 6 * k
         ..color = Colors.white.withValues(alpha: 0.35),
     );
+}
+
+// ---------------------------------------------------------------------------
+// House ads — AdMob cross-promotion creatives
+// ---------------------------------------------------------------------------
+//
+// These run on the OTHER apps in the Megz portfolio, not inside Coloro, so
+// they are seen by people who already play this kind of game and have never
+// heard of this one. Three things have to survive at 320x50: the wordmark,
+// the half-drained board, and a yellow CTA. Everything else is negotiable.
+
+const _adTagline = 'Drain the pixels. Reveal the art.';
+const _adProof = '300 LEVELS  ·  PLAYS OFFLINE';
+
+/// [_miniBoard] paints a frame outside its rect, so a board that must fit a
+/// budget of [outer] pixels has this much dark panel.
+double _boardInner(double outer) => outer / 1.086;
+
+/// Single-line text metrics, so blocks can be stacked and centred against
+/// what the font actually produces. Fredoka's line box is far taller than
+/// its caps, and deriving a baseline from the font size instead of measuring
+/// is what leaves CTA labels sitting low in their pill.
+Size _measure(String text, double size, double weight) {
+  final tp = TextPainter(
+    text: TextSpan(
+        text: text, style: AppTypography.style(size: size, weight: weight)),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  return tp.size;
+}
+
+/// Draws [text] centred on [centre] in both axes.
+void _adText(
+  Canvas canvas,
+  String text,
+  Offset centre, {
+  required double size,
+  double weight = 700,
+  Color color = _white,
+  List<Shadow>? shadows,
+}) {
+  final tp = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: AppTypography.style(
+          size: size, weight: weight, color: color, shadows: shadows),
+    ),
+    textDirection: TextDirection.ltr,
+  )..layout();
+  tp.paint(canvas, centre - Offset(tp.width / 2, tp.height / 2));
+}
+
+/// Shrinks [size] until [text] fits [maxWidth]. Every layout below is driven
+/// by the space available rather than a fixed scale, because the nine slots
+/// span a 20x range in width and a fixed ratio overflows at one end and
+/// looks lost at the other.
+double _fit(String text, double size, double weight, double maxWidth) {
+  final natural = _measure(text, size, weight).width;
+  return natural <= maxWidth ? size : size * maxWidth / natural;
+}
+
+void _adBackdrop(Canvas canvas, Size size) {
+  canvas.drawRect(
+    Offset.zero & size,
+    Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [_mid, _deep],
+      ).createShader(Offset.zero & size),
+  );
+}
+
+/// Loose beads in the corners. Skipped on the short strips, where at this
+/// scale they land as dirt rather than decoration.
+void _adBeads(Canvas canvas, Size size) {
+  final w = size.width, h = size.height;
+  final unit = math.min(w, h);
+  const scatter = [
+    [0.035, 0.045, 0.95, 0.0],
+    [0.905, 0.030, 0.62, 1.0],
+    [0.030, 0.885, 0.70, 2.0],
+    [0.920, 0.900, 0.52, 3.0],
+  ];
+  const palette = [_green, _cyan, _orange, _pink];
+  for (final s in scatter) {
+    final side = unit * 0.10 * s[2];
+    _bead(canvas, Rect.fromLTWH(w * s[0], h * s[1], side, side),
+        palette[s[3].toInt()],
+        rim: math.max(1.0, side * 0.11));
+  }
+}
+
+void _ctaPill(Canvas canvas, Rect r, String label) {
+  canvas
+    ..drawRRect(
+      RRect.fromRectAndRadius(
+          r.translate(0, r.height * 0.11), Radius.circular(r.height / 2)),
+      Paint()..color = const Color(0x4D000000),
+    )
+    ..drawRRect(
+      RRect.fromRectAndRadius(r, Radius.circular(r.height / 2)),
+      Paint()..color = _yellow,
+    );
+  final size = _fit(label, r.height * 0.46, 700, r.width * 0.82);
+  _adText(canvas, label, r.center, size: size, weight: 700, color: _ink);
+}
+
+void _paintHouseAd(Canvas canvas, Size size) {
+  _adBackdrop(canvas, size);
+  final aspect = size.width / size.height;
+  if (aspect >= 4.0) {
+    _adStrip(canvas, size);
+  } else if (aspect >= 1.25) {
+    _adCard(canvas, size);
+  } else {
+    _adHero(canvas, size);
+  }
+}
+
+/// 320x50, 468x60, 728x90 — one line of everything: board, name, CTA.
+void _adStrip(Canvas canvas, Size size) {
+  final w = size.width, h = size.height;
+  final pad = h * 0.11;
+
+  final inner = _boardInner(h - pad * 2);
+  final frame = inner * 0.043;
+  _miniBoard(
+    canvas,
+    Rect.fromLTWH(pad + frame, (h - inner) / 2, inner, inner),
+    frame: frame,
+    frameRadius: inner * 0.091,
+    radius: inner * 0.057,
+  );
+
+  final pillH = h * 0.56;
+  final pillW = pillH * 3.2;
+  final pill =
+      Rect.fromLTWH(w - pad - pillW, (h - pillH) / 2, pillW, pillH);
+  _ctaPill(canvas, pill, 'PLAY FREE');
+
+  final left = pad + frame * 2 + inner + h * 0.20;
+  final avail = pill.left - h * 0.16 - left;
+  final titleSize = _fit('COLORO', h * 0.44, 700, avail);
+  final subSize = _fit(_adTagline, titleSize * 0.40, 600, avail);
+  final titleH = _measure('COLORO', titleSize, 700).height;
+  final subH = _measure(_adTagline, subSize, 600).height;
+  final gap = h * 0.02;
+  var y = (h - (titleH + gap + subH)) / 2;
+
+  _adText(canvas, 'COLORO', Offset(left + avail / 2, y + titleH / 2),
+      size: titleSize,
+      weight: 700,
+      shadows: const [
+        Shadow(color: Color(0x99000000), offset: Offset(0, 2), blurRadius: 5),
+      ]);
+  y += titleH + gap;
+  _adText(canvas, _adTagline, Offset(left + avail / 2, y + subH / 2),
+      size: subSize, weight: 600, color: const Color(0xFFE3D8FF));
+}
+
+/// 320x100, 480x320, 1024x768 — the feature-graphic composition: everything
+/// stacked on the left, the board holding the right.
+void _adCard(Canvas canvas, Size size) {
+  final w = size.width, h = size.height;
+  _adBeads(canvas, size);
+  final pad = w * 0.04;
+
+  final outer = math.min(h * 0.84, w * 0.40);
+  final inner = _boardInner(outer);
+  final frame = inner * 0.043;
+  _miniBoard(
+    canvas,
+    Rect.fromLTWH(w - pad - frame - inner, (h - inner) / 2, inner, inner),
+    frame: frame,
+    frameRadius: inner * 0.091,
+    radius: inner * 0.057,
+  );
+
+  final left = pad + w * 0.025;
+  final avail = (w - pad - frame * 2 - inner) - w * 0.045 - left;
+  final cx = left + avail / 2;
+
+  final titleSize = _fit('COLORO', math.min(h * 0.34, w * 0.13), 700, avail);
+  final subSize = _fit(_adTagline, titleSize * 0.315, 600, avail);
+  final titleH = _measure('COLORO', titleSize, 700).height;
+  final subH = _measure(_adTagline, subSize, 600).height;
+
+  final pillH = (h * 0.17).clamp(22.0, 84.0);
+  final pillW = math.min(avail, pillH * 3.3);
+  final gap = h * 0.035;
+
+  // The proof line is what stops the big tablet slots reading as a mostly
+  // empty poster; the 100px-tall banner has no room for it.
+  final showProof = h >= 260;
+  final proofSize = _fit(_adProof, titleSize * 0.24, 650, avail);
+  final proofH = showProof ? _measure(_adProof, proofSize, 650).height : 0.0;
+
+  final blockH = titleH +
+      gap * 0.4 +
+      subH +
+      (showProof ? gap * 0.55 + proofH : 0.0) +
+      gap +
+      pillH;
+  var y = (h - blockH) / 2;
+
+  _adText(canvas, 'COLORO', Offset(cx, y + titleH / 2),
+      size: titleSize,
+      weight: 700,
+      shadows: const [
+        Shadow(color: Color(0xAA000000), offset: Offset(0, 4), blurRadius: 10),
+      ]);
+  y += titleH + gap * 0.4;
+  _adText(canvas, _adTagline, Offset(cx, y + subH / 2),
+      size: subSize, weight: 600, color: const Color(0xFFE3D8FF));
+  y += subH;
+  if (showProof) {
+    y += gap * 0.55;
+    _adText(canvas, _adProof, Offset(cx, y + proofH / 2),
+        size: proofSize, weight: 650, color: _yellow);
+    y += proofH;
+  }
+  y += gap;
+  _ctaPill(canvas, Rect.fromLTWH(cx - pillW / 2, y, pillW, pillH),
+      'PLAY FREE');
+}
+
+/// 300x250, 320x480, 768x1024 — a full portrait poster: name, promise,
+/// board, button.
+void _adHero(Canvas canvas, Size size) {
+  final w = size.width, h = size.height;
+  _adBeads(canvas, size);
+  final pad = math.max(h * 0.05, 13.0);
+
+  // 0.70, not the full width: the corner beads sit at x 0.035 and 0.905, and
+  // a wordmark fitted to 0.84w runs straight under the top-left one.
+  final titleSize = _fit('COLORO', math.min(w * 0.20, h * 0.15), 700, w * 0.70);
+  final titleH = _measure('COLORO', titleSize, 700).height;
+
+  // Below roughly 280px of height the tagline and the board are competing
+  // for the same pixels, and the board is what sells the game.
+  final showSub = h >= 280;
+  final subSize = _fit(_adTagline, titleSize * 0.30, 600, w * 0.88);
+  final subH = showSub ? _measure(_adTagline, subSize, 600).height : 0.0;
+
+  final pillH = (h * 0.13).clamp(26.0, 96.0);
+  final pillW = math.min(w * 0.76, pillH * 3.4);
+
+  var y = pad;
+  _adText(canvas, 'COLORO', Offset(w / 2, y + titleH / 2),
+      size: titleSize,
+      weight: 700,
+      shadows: const [
+        Shadow(color: Color(0xAA000000), offset: Offset(0, 4), blurRadius: 11),
+      ]);
+  y += titleH;
+  if (showSub) {
+    y += h * 0.012;
+    _adText(canvas, _adTagline, Offset(w / 2, y + subH / 2),
+        size: subSize, weight: 600, color: const Color(0xFFE3D8FF));
+    y += subH;
+  }
+  y += h * 0.03;
+
+  final pillTop = h - pad - pillH;
+  final proofSize = _fit(_adProof, titleSize * 0.26, 650, w * 0.9);
+  final proofH = _measure(_adProof, proofSize, 650).height;
+  final showProof = h >= 380;
+  final boardBottom =
+      pillTop - h * 0.03 - (showProof ? proofH + h * 0.02 : 0.0);
+
+  final outer = math.min(w * 0.78, boardBottom - y);
+  final inner = _boardInner(outer);
+  final frame = inner * 0.043;
+  _miniBoard(
+    canvas,
+    Rect.fromLTWH(
+        (w - inner) / 2, y + (boardBottom - y - inner) / 2, inner, inner),
+    frame: frame,
+    frameRadius: inner * 0.091,
+    radius: inner * 0.057,
+  );
+
+  if (showProof) {
+    _adText(canvas, _adProof,
+        Offset(w / 2, boardBottom + h * 0.014 + proofH / 2),
+        size: proofSize, weight: 650, color: _yellow);
+  }
+  _ctaPill(canvas, Rect.fromLTWH((w - pillW) / 2, pillTop, pillW, pillH),
+      'PLAY FREE');
 }

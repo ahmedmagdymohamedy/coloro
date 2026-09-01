@@ -49,6 +49,16 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <!-- Meta (Facebook) App Events. Values live in res/values/strings.xml
+             and are Android-only by design; the matching Info.plist keys are
+             deliberately absent so the SDK stays inert on iOS. -->
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.facebook.sdk.ClientToken"
+            android:value="@string/facebook_client_token" />
+
         <!-- Without these two, a "send to all users" campaign from the
              Firebase console arrives as a grey square on an unnamed default
              channel. They set the tray icon and route console pushes into the
