@@ -67,6 +67,28 @@ request mechanism.
   Google Site (or host it separately and swap the URL). This is the remaining
   inconsistency a human reviewer could still act on.
 
+## 1.0.8 is now on internal testing too (1 Sep)
+
+It was missing there because the 1.0.8 deploy ran
+`deploy_mobile_version.sh --track production`. That flag makes the script
+upload the bundle and assign it **straight to production** — it does not pass
+through internal testing on the way, so the internal track sat on 1.0.7 (29
+Aug) and there was nothing to test.
+
+Fixed by creating an internal-testing release from the **same code 8 bundle**
+already in the app-bundle library (Create release → *Add from library* →
+code 8), so the build under review and the build being tested are byte
+identical. Published immediately; the only warning was the known APK-size
+advisory (Unity SDK ≈ +8 MB).
+
+Tester opt-in link (list "My friends", 16 testers):
+**https://play.google.com/apps/internaltest/4701727256833733267**
+
+**Rule going forward:** the script's default track is `internal` for a
+reason — ship there, test, then promote. Only pass `--track production` when
+the build has already been tested, or expect to add the internal release by
+hand afterwards.
+
 ## ▶ Where to resume (next session, in value order)
 
 1. **Watch the 1.0.8 re-review** (sent 1 Sep, ≤7 days). Play Console →

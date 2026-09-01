@@ -97,7 +97,29 @@ was deliberately not attempted.
 
 If the re-review fails, this is the first thing to check — not the form.
 
-## 6. Notes for the next browser session
+## 6. 1.0.8 was never on internal testing — added afterwards
+
+Ahmed asked why he could not test code 8. Internal testing was still on
+**1.0.7 (29 Aug)**: the 1.0.8 deploy last session ran
+`./scripts/deploy_mobile_version.sh --android-only --skip-build --track production`,
+and `--track production` assigns the uploaded bundle to production *only* —
+the script's `TRACK` is a single destination, not a promotion chain, so
+internal was skipped entirely. (Its default is `TRACK="internal"`; the flag
+overrode it.)
+
+Fixed without a rebuild: internal testing → Create release → **Add from
+library** → code 8 → publish. Same bundle as the one in production review, so
+what he tests is exactly what Google is reviewing. Release named "8 (1.0.8)",
+notes added, published immediately (internal releases do not wait for the
+production review). Sole warning: the known APK-size advisory.
+
+Opt-in link for testers: `https://play.google.com/apps/internaltest/4701727256833733267`
+(list "My friends", 16 testers, enabled).
+
+**Rule:** ship to internal, test, then promote. `--track production` on an
+untested build leaves nothing to test.
+
+## 7. Notes for the next browser session
 
 - Play Console renders in **Arabic/RTL** for this account. Step tabs in the
   Data safety wizard are not clickable; you must walk 1→5 with "التالي".
