@@ -9,30 +9,38 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
 | | |
 |---|---|
-| **Google Play** | **LIVE.** Approved 27 Aug. Production = 1.0.7 (code 7), 177 countries. Listing art = 1.0.7 palette (replaced 1 Sep). **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
-| **App Store** | 1.0.6 (the **old palette**) is in Apple's review queue. 1.0.7 went to TestFlight only, per instruction. |
-| **This build** | `1.0.7+7` — fixed palette, ad fixes, playable v2. All 300 levels re-proved. |
-| **Git** | ⚠️ **33 files uncommitted.** HEAD is still `9812c96 "V 6"` from before this session. |
+| **Google Play** | **LIVE.** Production = 1.0.7 (code 7); **1.0.8 (code 8) uploaded to production 1 Sep, in Google's update review** — adds Unity Ads mediation. Listing art = 1.0.7 palette. **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
+| **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
+| **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
+| **Git** | ✅ Clean and pushed. `39cc662` = 1.0.7 as shipped; `29f95a1` = 1.0.8 mediation. |
 
 ---
 
-## ⚠️ Commit the whole tree together
+## ✅ Resolved 1 Sep: the tree is committed and pushed
 
-The working tree is **the only copy of the source for the build now sitting in
-Google's review queue**, and this change set has a coupling hazard: the
-quantizer rewrite (`lib/`) and the repaired `assets/levels/levels.json` are a
-**matched pair**. The deals in `levels.json` were searched against this exact
-quantizer.
+The former warning here (33 uncommitted files, `lib/` + `levels.json`
+coupling) is closed: `39cc662` committed the 1.0.7-as-shipped tree in one
+piece after a 303/303 full sweep, and `29f95a1` added the 1.0.8 mediation
+change. The `lib/` + `assets/levels/levels.json` matched-pair rule still
+applies to any future palette/quantizer work.
 
-**A partial commit — `lib/` without `assets/`, or the reverse — reconstructs
-exactly the unwinnable-campaign state this session existed to fix.** Commit
-and push everything in one go, then confirm:
+## ▶ Where to resume (next session, in value order)
 
-```sh
-COLORO_FULL_SWEEP=1 flutter test test/stall_diagnostic_test.dart   # must be 303/303
-```
-
-I did not commit because committing has not been asked for.
+1. **AppLovin SDK key** (Ahmed was locked out of max.applovin.com; reset
+   pending). When available: `applovin.sdk.key` meta-data in
+   `AndroidManifest.xml` + AppLovin as a *waterfall* source in the three
+   mediation groups (it does not bid on AdMob) → ship as 1.0.9.
+2. **Check the reviews**: Play 1.0.8 rollout; Apple 1.0.7 (auto-releases).
+   When iOS is live: declare the iOS platform in the Meta app
+   (`marketing/docs/facebook-app-events.md` §1b) and plan iOS mediation
+   behind a real ATT flow.
+3. **13 Sep**: the Google Ads flight completes — read against
+   `marketing/MARKETING_PLAN.md` §2.5 kill criteria. Until then: hands off.
+4. **~8 Sep**: compare mediation vs the baseline table in
+   `chat_history/2026-09-01-mediation-and-releases-session.md` §5.
+5. Ahmed's own list: Unity payout profile; revoke the 3 unknown "Windows"
+   browsers in the Claude extension; 5 remaining house-ad sizes (any
+   session can click those through).
 
 ---
 
@@ -113,16 +121,15 @@ Two solver improvements worth knowing about, in `bottle_factory.dart`:
 
 ---
 
-## iOS: the stores will diverge until you act
+## iOS: resolved 1 Sep — 1.0.7 is the build in Apple's queue
 
-Apple is reviewing **1.0.6 — the build with the near-identical colours**.
-1.0.7 was sent to TestFlight only, as instructed, because submitting a second
-version would replace the one in the queue and restart its clock.
-
-So when Apple approves, the App Store ships the "two greens" build while Play
-ships the fix. **Once Apple's current review resolves, submit 1.0.7 (7) for
-iOS review** to bring the two stores back together. The build is already
-uploaded and waiting in TestFlight — it only needs selecting and submitting.
+The old-palette submission (version record "1.0.5" carrying build 6) was
+removed from review on 1 Sep; the record was renamed **1.0.7**, build 7
+(fixed palette, from TestFlight) attached and submitted. Auto-release on
+approval. The stores now differ only by minor version (iOS 1.0.7 vs Android
+1.0.8) — mediation is Android-only on purpose (no App Store presence yet,
+prior tracking-signal rejection, SPM-only build). iOS mediation is a future
+release with a real ATT + UMP consent flow.
 
 ---
 

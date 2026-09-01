@@ -64,14 +64,20 @@ that maximises the odds and report real numbers monthly.
 Raises eCPM **30–80%** with no game changes. Going from $0.03 to $0.045
 ARPDAU cuts the DAU needed by a third.
 
-- [ ] AdMob → Mediation → create groups for **banner / interstitial / rewarded**
-- [ ] Add **AppLovin** (usually the strongest in MENA/SEA)
-- [ ] Add **Unity Ads**
+- [x] AdMob → Mediation → create groups for **banner / interstitial / rewarded**
+      — done 1 Sep: Coloro-{Banner,Interstitial,Rewarded}-Android, Android only
+- [ ] Add **AppLovin** — waterfall only (no AdMob bidding); blocked on the
+      SDK key (Ahmed locked out of max.applovin.com, reset pending)
+- [x] Add **Unity Ads** — done 1 Sep as a BIDDING source in all 3 groups
+      (Game ID 6183792); adapter shipped in Android 1.0.8+8
 - [ ] Add **Meta Audience Network** — *needs the Facebook app to exist first*
 - [ ] Add **Liftoff/Vungle** + **ironSource** if setup time allows
 - [ ] Enable **bidding** (not waterfall) wherever the network supports it
-- [ ] Verify live fill on a real device for all three formats
-- [ ] Record baseline eCPM per format **before** switching, so the lift is measurable
+- [ ] Verify live fill on a real device for all three formats (after the
+      1.0.8 rollout; Unity game IDs also take a day or two to warm up)
+- [x] Record baseline eCPM per format **before** switching — recorded 1 Sep,
+      table in `chat_history/2026-09-01-mediation-and-releases-session.md` §5
+      (blended 161.92 EGP eCPM, banner match 40.98%)
 
 ### 1.2 Cross-promotion from the Megz portfolio — the only free install channel at scale
 Ahmed owns **14 Play apps**. La3bangy alone: **6.74k active users, 11.3k
@@ -83,6 +89,10 @@ acquisitions/30d**. This costs nothing and starts immediately.
       — **creatives done 29 Aug**: all nine AdMob image-ad sizes in
       `marketing/ads/`, generated from the real game art. Upload steps and
       the referrer-tagged destination URL are in `marketing/ads/README.md`.
+      **Campaign LIVE 1 Sep**: `Coloro-House-CrossPromo`, Google-optimized
+      backfill goal, all Android portfolio ad units (iOS apps excluded —
+      the destination is the Play listing). 4/9 sizes uploaded (320x50,
+      300x250, 320x480, 480x320); the other 5 are a 10-minute click-through.
 - [ ] Better: a native cross-promo card on each game's menu/level-complete screen
 - [ ] Track with a distinct UTM / referrer per source app
 - [ ] Target: **500–1,500 installs/month** from this channel alone
