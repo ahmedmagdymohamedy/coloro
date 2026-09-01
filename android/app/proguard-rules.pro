@@ -6,3 +6,11 @@
 # This reaches us through play-services-ads, which pins androidx.work 2.7.0 —
 # a Room version predating the consumer rules that newer releases ship.
 -keep class * extends androidx.room.RoomDatabase { <init>(); }
+
+# AppLovin's bundled OMID library optionally attests through Amazon's
+# Privacy Pass on Amazon devices; the classes are compile-time only and
+# absent from our dependency graph. Safe to suppress — the code path is
+# guarded at runtime.
+-dontwarn com.amazon.privacypass.PrivacyPass
+-dontwarn com.amazon.privacypass.VerificationContext
+-dontwarn com.amazon.privacypass.callback.AttestAPICallback

@@ -83,4 +83,18 @@ dependencies {
     // Backports the java.time APIs flutter_local_notifications schedules with
     // to older Android versions. Version pinned by the plugin's README.
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+
+    // AdMob mediation adapters, Android only — deliberately plain Gradle
+    // dependencies rather than the gma_mediation_* Flutter packages, so the
+    // iOS build (SPM-only, no Podfile, and a prior tracking-signal rejection
+    // on record) is never touched. The GMA SDK discovers adapters natively;
+    // no Dart-side code is needed.
+    //   Unity Ads — bidding, mapped in the three Coloro-*-Android mediation
+    //   groups (Game ID 6183792). The adapter does NOT pull the Unity SDK in
+    //   transitively (R8 fails on missing com.unity3d.* without it).
+    implementation("com.unity3d.ads:unity-ads:4.20.0")
+    implementation("com.google.ads.mediation:unity:4.20.0.1")
+    //   AppLovin — waterfall only (AppLovin does not bid on AdMob). Needs
+    //   applovin.sdk.key in AndroidManifest.xml to serve.
+    implementation("com.google.ads.mediation:applovin:13.6.4.0")
 }
