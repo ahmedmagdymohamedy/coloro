@@ -11,7 +11,7 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 |---|---|
 | **Google Play** | **Live to users = 1.0.8** (approved 3 Sep after the data-safety fix). **1.0.9 (code 9) uploaded to production 3 Sep and IN REVIEW**; the same bundle is **live on internal testing now** — installable via https://play.google.com/apps/internaltest/4701727256833733267. Listing art = 1.0.7 palette. |
 | **TestFlight** | **1.0.9 (build 9) uploaded 3 Sep** — validated and delivered (UUID `7cd97c4a-35ea-442e-b9a4-2490e9ad5cab`). **Not submitted for App Store review:** 1.0.7 has been Waiting for Review since 1 Sep and pulling it would forfeit that queue position. Submit 1.0.9 once 1.0.7 is through — needs Ahmed's ASC login. |
-| **Flight 1** | Ran 1–2 Sep, **PAUSED 3 Sep** at ≈E£1,700 (~$34) spent. CPI $0.30 was on plan; both value gates failed. Full read: `marketing/FLIGHT1_READ_2026-09-03.md`. Restart gate: `finish_level_5` ≥ 15% of installs on organic traffic. |
+| **Flight 1** | Ran 1–2 Sep, **PAUSED 3 Sep** at ≈E£1,700 (~$34) spent. CPI $0.30 was on plan; both value gates failed. Full read: `marketing/FLIGHT1_READ_2026-09-03.md`. **Restart planned at E£100/day — BLOCKED, needs Ahmed** (see below). |
 | **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
 | **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
 | **Git** | ✅ Clean and pushed. `39cc662` = 1.0.7 as shipped; `29f95a1` = 1.0.8 mediation. |
@@ -129,6 +129,28 @@ then.
 
 Tune `_skipOfferAfterLosses` (game_screen.dart) against the new
 `level_skipped` event, which carries the loss count that earned each skip.
+
+## ⛔ Blocked on Ahmed — restarting the flight at E£100/day
+
+The "restart when organic traffic clears 15%" gate was **wrong** — there is no
+organic traffic, so it could never be met. Corrected reasoning and the dead
+free-channel evidence are in `MARKETING_PLAN.md` §2.7.
+
+**Two clicks needed in Google Ads** (account 806-993-4443, campaign
+`Coloro-AC1-Install-Flight1`, id 24202059293):
+
+1. Daily budget **E£500 → E£100**
+2. Status **Paused → Enabled** (end date stays 13 Sep)
+
+≈E£1,100 to 13 Sep ≈ 70 installs; September total ≈E£2,800 of the 5,000
+budget. **A session agent cannot do step 1** — typing a monetary value into an
+ad platform is refused by the permission layer, and it should stay that way.
+The campaign is safely paused until then; nothing is spending.
+
+Also worth 30 seconds while in AdMob: campaign **`Coloro` (24197514460)** is
+an install campaign with a **max CPI of E£1.00** against a market rate of
+~E£15. It cannot win an auction, and has served 285 impressions for 0
+installs. Re-price it or pause it.
 
 ## ▶ Where to resume (next session, in value order)
 

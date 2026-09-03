@@ -275,10 +275,47 @@ hands-off rule. §2.2b is the precedent: it refused to launch on 1.0.6 because
 defect*. The onboarding wall was that defect. The 112-user cohort keeps ageing
 for free, so nothing was lost by stopping.
 
-**Restart gate for flight 2:** `finish_level_5` ≥ 15% of installs on organic
-traffic, measured after 1.0.9 has been live long enough to have a cohort. Same
-creative — a 9.2% CTR is not the problem. Nothing else about the campaign
-changes; it is parked, not deleted.
+**Restart gate for flight 2:** ~~`finish_level_5` ≥ 15% of installs on organic
+traffic~~ — **this gate was wrong and is withdrawn (3 Sep, Ahmed's catch).**
+
+### 2.7 The organic-traffic gate was unmeasurable
+
+§2.6 said flight 2 restarts once `finish_level_5` clears 15% **on organic
+traffic**. Ahmed pointed out the hole: **there is no organic traffic**, so
+that condition could never have been met, and the campaign would have stayed
+off forever waiting for a number that would never arrive.
+
+Both free channels are confirmed dead (AdMob campaigns page, 27 Aug – 2 Sep):
+
+| Campaign | Type | Impressions | Installs |
+|---|---|---|---|
+| `Coloro-House-CrossPromo` (24196628355) | Google-optimised **backfill** — serves only inventory that would otherwise go unfilled | 222 | **0** |
+| `Coloro` (24197514460) | AdMob install campaign, **max CPI E£1.00** | 285 | **0** |
+
+The second one is the sharper finding: **its cost cap is E£1.00 per install
+against a real market CPI of ~E£15.** It cannot win an auction at that price,
+so it has been serving impressions and buying nothing. Either re-price it or
+pause it; as configured it is noise.
+
+**Corrected gate — measured on PAID installs, because that is the only traffic
+that exists:**
+
+Buy a deliberately small measurement cohort and read the same two numbers off
+it. 1.0.9 went live 3 Sep 05:14, so every new install now gets the new build
+with no update needed — new installs are the *cleanest* place to measure, not
+a compromise.
+
+- **Budget: E£100/day** (down from E£500), running to the campaign's existing
+  13 Sep end date ≈ **E£1,100 ≈ 70 installs**. September total then lands near
+  E£2,800 of the 5,000/month budget.
+- **Why not E£50/day** as first suggested: at ~E£15 CPI that is ~3 installs a
+  day, so a readable cohort takes a month. The two rates cost about the same
+  in total — the difference is only whether the answer arrives on 13 Sep or in
+  October.
+- **Read on 13 Sep:** `finish_level_5` / installs (was 8%, target ≥15%) and
+  `ad_shown` users / `first_open` users (was 8%). The second should move on
+  its own from the ad-gate change even before new installs arrive, as existing
+  players update.
 
 ---
 
