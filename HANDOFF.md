@@ -9,7 +9,8 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
 | | |
 |---|---|
-| **Google Play** | **LIVE — production = 1.0.8 (code 8), approved and available** (verified 3 Sep). It had been rejected 1 Sep for an invalid Data safety form; the corrected form cleared review — see "The data-safety rejection" below. Also on internal testing. Listing art = 1.0.7 palette. |
+| **Google Play** | **Live to users = 1.0.8** (approved 3 Sep after the data-safety fix). **1.0.9 (code 9) uploaded to production 3 Sep and IN REVIEW**; the same bundle is **live on internal testing now** — installable via https://play.google.com/apps/internaltest/4701727256833733267. Listing art = 1.0.7 palette. |
+| **TestFlight** | **1.0.9 (build 9) uploaded 3 Sep** — validated and delivered (UUID `7cd97c4a-35ea-442e-b9a4-2490e9ad5cab`). **Not submitted for App Store review:** 1.0.7 has been Waiting for Review since 1 Sep and pulling it would forfeit that queue position. Submit 1.0.9 once 1.0.7 is through — needs Ahmed's ASC login. |
 | **Flight 1** | Ran 1–2 Sep, **PAUSED 3 Sep** at ≈E£1,700 (~$34) spent. CPI $0.30 was on plan; both value gates failed. Full read: `marketing/FLIGHT1_READ_2026-09-03.md`. Restart gate: `finish_level_5` ≥ 15% of installs on organic traffic. |
 | **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
 | **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
@@ -89,6 +90,11 @@ Tester opt-in link (list "My friends", 16 testers):
 reason — ship there, test, then promote. Only pass `--track production` when
 the build has already been tested, or expect to add the internal release by
 hand afterwards.
+
+**1.0.9 followed it.** It went to production directly because Ahmed asked for
+a new version submitted to both stores, and the internal release was added by
+hand the same night from the same code-9 bundle — so there is something to
+install while production sits in review.
 
 ## What 1.0.9 changes, and why (3 Sep, autonomous session)
 

@@ -98,6 +98,20 @@ submit 1.0.9 would have forfeited a queue position on a platform with no
 users yet. The binary is uploaded and waiting; submitting it is one click
 whenever iOS 1.0.7 is through.
 
+## 3b. Where 1.0.9 actually landed
+
+`deploy_mobile_version.sh --track production` — exit 0 in 11m 1s.
+
+| | State |
+|---|---|
+| Play production | **1.0.9 in review**, 177 countries. Users stay on 1.0.8 until it clears. |
+| Play internal testing | **1.0.9 live now**, same code-9 bundle, added by hand right after. Opt-in: `https://play.google.com/apps/internaltest/4701727256833733267` |
+| TestFlight | **Build 9 validated and delivered**, UUID `7cd97c4a-35ea-442e-b9a4-2490e9ad5cab`. Not submitted to App Store review (see above). |
+
+The AAB was checked to actually carry `1.0.9` before any of this. The one
+build warning was cosmetic and pre-existing: the iOS launch image is still the
+Flutter placeholder — worth fixing, unrelated to tonight.
+
 ## 4. Verification before shipping
 
 - `flutter analyze lib/ test/ tool/` — clean
