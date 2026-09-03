@@ -1,7 +1,12 @@
 # Coloro — engineering handoff
 
-**Last updated:** 1 Sep 2026 (evening — after the Play data-safety rejection).
-Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
+**Last updated:** 3 Sep 2026.
+
+**New here? Read [`backlog/`](backlog/) first** — it is the project's memory:
+what was decided, why, and how it turned out, plus every account and ID in one
+place. This file only covers **current state and what to do next**; the backlog
+covers **history and reasoning**. Session records: `chat_history/`. Marketing:
+`marketing/MARKETING_PLAN.md`.
 
 ---
 
@@ -130,27 +135,21 @@ then.
 Tune `_skipOfferAfterLosses` (game_screen.dart) against the new
 `level_skipped` event, which carries the loss count that earned each skip.
 
-## ⛔ Blocked on Ahmed — restarting the flight at E£100/day
+## ✅ Flight resumed at E£100/day (Ahmed, 3 Sep)
 
-The "restart when organic traffic clears 15%" gate was **wrong** — there is no
-organic traffic, so it could never be met. Corrected reasoning and the dead
-free-channel evidence are in `MARKETING_PLAN.md` §2.7.
+Verified in the console: `Coloro-AC1-Install-Flight1` is **Enabled, E£100/day,
+status "eligible (learning)"**, ending 13 Sep. ≈E£1,100 for ~70 installs;
+September lands near E£2,800 of the 5,000 budget.
 
-**Two clicks needed in Google Ads** (account 806-993-4443, campaign
-`Coloro-AC1-Install-Flight1`, id 24202059293):
+Ahmed made the change himself — typing a monetary value into an ad platform is
+refused by the agent permission layer, and that guard should stay. Reasoning
+for the rate and for withdrawing the old organic-traffic gate:
+`MARKETING_PLAN.md` §2.7 and backlog **D-15**/**D-16**.
 
-1. Daily budget **E£500 → E£100**
-2. Status **Paused → Enabled** (end date stays 13 Sep)
-
-≈E£1,100 to 13 Sep ≈ 70 installs; September total ≈E£2,800 of the 5,000
-budget. **A session agent cannot do step 1** — typing a monetary value into an
-ad platform is refused by the permission layer, and it should stay that way.
-The campaign is safely paused until then; nothing is spending.
-
-Also worth 30 seconds while in AdMob: campaign **`Coloro` (24197514460)** is
-an install campaign with a **max CPI of E£1.00** against a market rate of
-~E£15. It cannot win an auction, and has served 285 impressions for 0
-installs. Re-price it or pause it.
+**Still open, 30 seconds in AdMob:** campaign **`Coloro` (24197514460)** is an
+install campaign with a **max CPI of E£1.00** against a ~E£15 market rate. It
+cannot win an auction and has served 285 impressions for 0 installs. Re-price
+it or pause it.
 
 ## ▶ Where to resume (next session, in value order)
 

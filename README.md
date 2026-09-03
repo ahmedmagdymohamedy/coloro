@@ -4,6 +4,10 @@ A juicy pixel-art puzzle game built with Flutter. Dock paint flasks under
 the picture and they drink it away row by row from the bottom edge — pick
 the right colors, finish the image, unlock the next one.
 
+> **Live on Google Play.** For the state of the project read `HANDOFF.md`; for
+> the story of how it got here — every decision and why — read
+> [`backlog/`](backlog/).
+
 ## Run the app
 
 ```sh
