@@ -21,14 +21,21 @@ class AdService {
 
   static final AdService instance = AdService._();
 
-  /// No ads of any kind — banner or interstitial — until the player reaches
-  /// this level. The first three levels are a clean onboarding run, and the
-  /// notification opt-in at the end of level 3 gets the screen to itself.
-  static const adsFromLevel = 4;
+  /// The banner is shown from this level on.
+  ///
+  /// This was 4, to buy a clean three-level onboarding run. The first flight
+  /// of paid installs priced that decision: of 99 players who opened the app,
+  /// 70 started a level, 24 ever won one and only 8 reached level 5 — so the
+  /// gate meant **92% of acquired users never saw a single ad**, and $34 of
+  /// spend returned $0.28. The onboarding it was protecting is not where
+  /// players are lost; level 1 is (36 of the 70 lost it). A banner is passive
+  /// and costs no attention, so it now runs from the first level.
+  static const adsFromLevel = 1;
 
-  /// Interstitials are gated per completed level; the banner is gated by
-  /// [adsUnlocked]. Both start at [adsFromLevel].
-  static const interstitialFromLevel = adsFromLevel;
+  /// Interstitials start one level later than the banner: the very first
+  /// level a player finishes still ends without a full-screen ad, which is
+  /// the part of the clean-onboarding idea worth keeping.
+  static const interstitialFromLevel = 2;
 
   /// Shortest gap between two interstitials. Levels normally run longer than
   /// this, so it only ever suppresses pathological back-to-back cases (a

@@ -35,6 +35,14 @@ import 'widgets/notify_permission_sheet.dart';
 /// The player is asked to enable reminders once, after finishing this level.
 const _askForNotificationsAfterLevel = 3;
 
+/// Consecutive losses on one level before the player is offered a way past it.
+///
+/// The first flight of paid installs showed 46 players losing 291 times — 6.3
+/// losses each — while only 24 of 99 ever won a level at all. Those attempts
+/// were the game's clearest signal of intent and its largest exit. Three is
+/// deliberately past "unlucky" and short of "gave up".
+const _skipOfferAfterLosses = 3;
+
 /// One level of gameplay: loads the pixel grid, then wires the simulation,
 /// audio, haptics and VFX together around a single frame ticker.
 class GameScreen extends StatefulWidget {
@@ -108,6 +116,12 @@ class GameScreenState extends State<GameScreen>
   LevelResult? _result;
   bool _machineJammed = false;
   bool _loadFailed = false;
+
+  /// Consecutive losses on this level, including the one on screen. Read from
+  /// [ProgressStore] rather than held here because every retry builds a fresh
+  /// GameScreen — and because a player who closes the app in frustration
+  /// should still be offered the way out when they come back.
+  int _lossStreak = 0;
 
   /// Test hook: the live simulation (null while loading).
   @visibleForTesting
@@ -363,9 +377,25 @@ class GameScreenState extends State<GameScreen>
     Haptics.heavy();
     _vfx.shake(7);
     AudioController.instance.play(Sfx.error, pitch: 0.75);
+
+    final store = await ProgressStore.load();
+    final streak = await store.recordLoss(widget.level.number);
+
     await Future<void>.delayed(const Duration(milliseconds: 450));
     if (!mounted) return;
-    setState(() => _machineJammed = true);
+    setState(() {
+      _lossStreak = streak;
+      _machineJammed = true;
+    });
+
+    // The rescue and skip offers are only wired when an ad is in hand, and
+    // both are evaluated at build time. If inventory arrives a moment late
+    // the offer would silently never appear, so ask once more shortly after.
+    if (!AdService.instance.isRewardedReady) {
+      AdService.instance.prewarm();
+      await Future<void>.delayed(const Duration(milliseconds: 1400));
+      if (mounted && _machineJammed) setState(() {});
+    }
   }
 
   Future<void> _onLevelComplete(LevelResult result) async {
@@ -515,6 +545,38 @@ class GameScreenState extends State<GameScreen>
     _game?.grantExtraSlotAndResume();
     setState(() => _machineJammed = false);
     Haptics.medium();
+  }
+
+  /// The way out of a level the player cannot solve.
+  ///
+  /// Offered only after [_skipOfferAfterLosses] losses on the same board. It
+  /// shows a rewarded ad when one is in hand, but the skip is granted either
+  /// way: a player stuck three times who is then also told "no" churns, and a
+  /// churned player earns nothing at all. The level is recorded as skipped
+  /// rather than completed, so the menu keeps telling the truth and the
+  /// player can come back and beat it properly.
+  Future<void> _skipLevel() async {
+    if (AdService.instance.isRewardedReady) {
+      final earned = await AdService.instance.showRewarded();
+      if (!mounted) return;
+      if (earned) {
+        AnalyticsService.instance.adShown(
+          format: 'rewarded_skip',
+          level: widget.level.number,
+        );
+      }
+    }
+    final store = await ProgressStore.load();
+    await store.skipLevel(widget.level.number);
+    AnalyticsService.instance.levelSkipped(
+      level: widget.level.number,
+      losses: _lossStreak,
+    );
+    AdService.instance.updateGate(store.unlockedLevel);
+    if (!mounted) return;
+    Haptics.medium();
+    // Same door as a win: the menu advances to the next picture.
+    Navigator.of(context).pop(GameExit.playNext);
   }
 
   /// The docked bottle's on-screen position, or null once it popped
@@ -708,6 +770,12 @@ class GameScreenState extends State<GameScreen>
                     AdService.instance.isRewardedReady && game.canEarnExtraSlot
                     ? _watchAdForExtraSlot
                     : null,
+                // Stuck for the third time on this board — offer the door out
+                // rather than a fourth identical defeat.
+                onSkip: _lossStreak >= _skipOfferAfterLosses && widget.hasNextLevel
+                    ? _skipLevel
+                    : null,
+                skipCostsAnAd: AdService.instance.isRewardedReady,
                 slotsNow: game.activeSlotCount,
                 slotsMax: GameController.maxSlots,
               ),

@@ -70,6 +70,12 @@ class AnalyticsService {
     MetaEvents.instance.rewardedCompleted(level: level);
   }
 
+  /// The player took the way out of a level they could not solve. [losses] is
+  /// how many attempts it took them to get there, which is the number that
+  /// says whether the offer is arriving too late or too early.
+  void levelSkipped({required int level, required int losses}) =>
+      _log('level_skipped', {'level': level, 'losses': losses});
+
   void adShown({required String format, required int level}) {
     _log('ad_shown', {'ad_format': format, 'level': level});
     MetaEvents.instance.adImpression(format: format, level: level);

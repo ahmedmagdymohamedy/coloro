@@ -16,6 +16,8 @@ class LevelFailedOverlay extends StatefulWidget {
     required this.onRetry,
     required this.onMenu,
     this.onWatchAd,
+    this.onSkip,
+    this.skipCostsAnAd = false,
     this.slotsNow = 0,
     this.slotsMax = 0,
   });
@@ -26,6 +28,14 @@ class LevelFailedOverlay extends StatefulWidget {
   /// Rewarded-ad rescue: null when no ad is ready or the machine has already
   /// grown to its maximum number of slots.
   final VoidCallback? onWatchAd;
+
+  /// Give up on this board and move to the next picture. Null until the
+  /// player has lost the same level enough times to be genuinely stuck.
+  final VoidCallback? onSkip;
+
+  /// Whether taking [onSkip] will play a rewarded ad first. Only affects the
+  /// wording — the skip is granted either way.
+  final bool skipCostsAnAd;
 
   /// Slots the machine has now, and the ceiling rescues can reach. Shown so
   /// the player can see the offer is finite rather than wondering why it
@@ -83,6 +93,11 @@ class _LevelFailedOverlayState extends State<LevelFailedOverlay>
     _stage.dispose();
     super.dispose();
   }
+
+  /// Whether anything on this card is a better offer than throwing the
+  /// attempt away. Retry only takes the spotlight when nothing else can.
+  bool get _hasFeaturedOffer =>
+      widget.onWatchAd != null || widget.onSkip != null;
 
   double _seg(double from, double to, [Curve curve = Curves.easeOut]) {
     final t = ((_stage.value - from) / (to - from)).clamp(0.0, 1.0);
@@ -227,26 +242,71 @@ class _LevelFailedOverlayState extends State<LevelFailedOverlay>
                                       opacity: altIn,
                                       child: Column(
                                         children: [
+                                          if (widget.onSkip != null) ...[
+                                            const SizedBox(height: 16),
+                                            BouncyButton(
+                                              onPressed: widget.onSkip!,
+                                              gradient: const LinearGradient(
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                                colors: [
+                                                  Color(0xFF7C9CFF),
+                                                  Color(0xFF3B5BDB),
+                                                ],
+                                              ),
+                                              pulse: widget.onWatchAd == null,
+                                              shine: widget.onWatchAd == null,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Icon(
+                                                    Icons
+                                                        .skip_next_rounded,
+                                                    color: Colors.white,
+                                                    size: 24,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    'SKIP THIS PICTURE',
+                                                    style:
+                                                        AppTypography.button(),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 7),
+                                            Text(
+                                              widget.skipCostsAnAd
+                                                  ? 'Watch a short ad and move '
+                                                        'to the next picture'
+                                                  : 'Move on to the next '
+                                                        'picture',
+                                              textAlign: TextAlign.center,
+                                              style: AppTypography.label(
+                                                size: 12,
+                                              ),
+                                            ),
+                                          ],
                                           const SizedBox(height: 16),
                                           BouncyButton(
                                             onPressed: widget.onRetry,
-                                            gradient: widget.onWatchAd == null
+                                            gradient: _hasFeaturedOffer
                                                 ? const LinearGradient(
+                                                    colors: [
+                                                      Color(0xFF4A4370),
+                                                      Color(0xFF3A3458),
+                                                    ],
+                                                  )
+                                                : const LinearGradient(
                                                     begin: Alignment.topCenter,
                                                     end: Alignment.bottomCenter,
                                                     colors: [
                                                       AppColors.ctaTop,
                                                       AppColors.ctaBottom,
                                                     ],
-                                                  )
-                                                : const LinearGradient(
-                                                    colors: [
-                                                      Color(0xFF4A4370),
-                                                      Color(0xFF3A3458),
-                                                    ],
                                                   ),
-                                            pulse: widget.onWatchAd == null,
-                                            shine: widget.onWatchAd == null,
+                                            pulse: !_hasFeaturedOffer,
+                                            shine: !_hasFeaturedOffer,
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
