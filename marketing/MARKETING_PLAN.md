@@ -262,6 +262,24 @@ Video script (15s, screen capture): 0–2s tap a bottle → "Pick a bottle." ·
   isn't delivering; fix the creative, not the bid
 - Cost per `finish_level_5` > $3.00 → that geo cannot reach the target
 
+### 2.6 Flight 1 — read, and PAUSED 3 Sep
+
+Two of the three gates failed on the first two days: CPI passed at **$0.30**,
+but `finish_level_5` came in at 0% attributed / 8% all-time against a 15% bar,
+and cost per `finish_level_5` at ~$4.25 against a $3.00 bar. Spend at pause:
+**≈E£1,700 (~$34)** of a ≈E£6,500 flight.
+
+The campaign was paused rather than run to 13 Sep, overriding §2.3's
+hands-off rule. §2.2b is the precedent: it refused to launch on 1.0.6 because
+*buying installs onto a build with a defect means paying to show people the
+defect*. The onboarding wall was that defect. The 112-user cohort keeps ageing
+for free, so nothing was lost by stopping.
+
+**Restart gate for flight 2:** `finish_level_5` ≥ 15% of installs on organic
+traffic, measured after 1.0.9 has been live long enough to have a cohort. Same
+creative — a 9.2% CTR is not the problem. Nothing else about the campaign
+changes; it is parked, not deleted.
+
 ---
 
 ## 3. Meta — app + events only, no ads
@@ -281,9 +299,22 @@ Network** in mediation (§1.1), which is worth real eCPM on its own.
 ## 4. In-game work that moves revenue
 Retention and ARPU are worth more than any ad spend at this budget.
 
+**This section stopped being optional on 3 Sep.** Flight 1 proved acquisition
+works ($0.30 CPI) and that the game cannot keep or monetise what it buys —
+8% of installs reached level 5, 8% ever saw an ad, ARPDAU $0.002 against the
+$0.03 this plan models. Full read: `FLIGHT1_READ_2026-09-03.md`.
+
 - [ ] **In-app review prompt** after a 3-level win streak (ratings drive ASO rank)
-- [ ] **Rewarded "skip this level"** after 3 losses on the same level — new
-      rewarded surface at peak intent
+- [x] **Rewarded "skip this level"** after 3 losses on the same level — new
+      rewarded surface at peak intent. **Shipped in 1.0.9 (3 Sep).** Grants the
+      skip even when no ad is in inventory: a player refused after three
+      defeats churns, and a churned player earns nothing. Recorded as skipped,
+      not completed. New `level_skipped` event carries the loss count so the
+      threshold of 3 can be tuned against real data.
+- [x] **Ads from level 1** — **shipped in 1.0.9 (3 Sep).** `adsFromLevel`
+      4 → 1 (banner) and interstitials 4 → 2. The old gate meant 92% of paid
+      installs never saw an ad; it was protecting an onboarding stretch that
+      players do not survive.
 - [ ] **Daily reward** rewarded video on the menu — +1 guaranteed rewarded view/DAU
 - [ ] **"More games" button** on the menu → portfolio cross-promo (see §1.2)
 - [ ] Interstitial on every level exit *(shipped)*

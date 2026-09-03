@@ -10,7 +10,7 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 | | |
 |---|---|
 | **Google Play** | **LIVE — production = 1.0.8 (code 8), approved and available** (verified 3 Sep). It had been rejected 1 Sep for an invalid Data safety form; the corrected form cleared review — see "The data-safety rejection" below. Also on internal testing. Listing art = 1.0.7 palette. |
-| **Flight 1** | Ran 1–2 Sep. **CPI $0.30 (on plan) but the funnel fails both value gates** — full read in `marketing/FLIGHT1_READ_2026-09-03.md`. **Recommendation to stop the flight is with Ahmed and not executed;** the campaign is still enabled. |
+| **Flight 1** | Ran 1–2 Sep, **PAUSED 3 Sep** at ≈E£1,700 (~$34) spent. CPI $0.30 was on plan; both value gates failed. Full read: `marketing/FLIGHT1_READ_2026-09-03.md`. Restart gate: `finish_level_5` ≥ 15% of installs on organic traffic. |
 | **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
 | **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
 | **Git** | ✅ Clean and pushed. `39cc662` = 1.0.7 as shipped; `29f95a1` = 1.0.8 mediation. |
@@ -90,19 +90,50 @@ reason — ship there, test, then promote. Only pass `--track production` when
 the build has already been tested, or expect to add the internal release by
 hand afterwards.
 
+## What 1.0.9 changes, and why (3 Sep, autonomous session)
+
+Ahmed handed over the decisions with one red line — **never exceed the
+budget** — and went to sleep. Three things happened:
+
+1. **The ad flight was paused.** Spend stopped at ≈E£1,700 of ≈E£6,500.
+2. **The ad gate moved down**: `adsFromLevel` 4 → 1 (banner),
+   `interstitialFromLevel` 4 → 2. The old gate meant 92% of paid installs
+   never saw an ad.
+3. **Losing three times now has a door out**: a `SKIP THIS PICTURE` offer on
+   the fail card, rewarded when inventory exists, granted either way. Skipped
+   levels are unlocked but never counted as completed.
+
+**Two design decisions worth not re-litigating:**
+
+- **The skip is granted even with no ad.** A player refused after three
+  defeats churns, and a churned player earns nothing. The ad is the upside,
+  not the toll.
+- **The back-button exit was left alone.** It is unserved inventory and it was
+  tempting, but "double-back is deliberately left alone" was a recorded
+  decision, not an oversight.
+
+**Deliberately NOT done: easing levels 1–5.** The obvious reading of "36 of 70
+lose level 1" is that the early levels are too hard, but levels 1–4 are
+already at the generator's floor — 15×15 grid, 5 colours, the minimum of the
+ramp. The wall is the *mechanic* (bottles starve, slots jam), not the grid, so
+regenerating art would have burned a long solver run to change nothing.
+Anything real here means a tutorial or a more forgiving early jam rule, which
+is a design change to make awake. The skip offer is the safety valve until
+then.
+
+Tune `_skipOfferAfterLosses` (game_screen.dart) against the new
+`level_skipped` event, which carries the loss count that earned each skip.
+
 ## ▶ Where to resume (next session, in value order)
 
-0. **✅ 1.0.8 is approved and live** (verified 3 Sep — production track shows
-   "متوفر على Google Play", publishing overview clean, no policy issues). The
-   data-safety fix worked. Nothing to watch here any more.
-1. **The Flight 1 decision is Ahmed's and is open.** Read
-   `marketing/FLIGHT1_READ_2026-09-03.md` first — it is the current state of
-   the whole marketing plan. Headline: acquisition works (CPI $0.30, 9.2%
-   CTR), the funnel does not (8% of installs reach level 5, 92% never see an
-   ad, $34 spent → $0.28 earned). The recommendation is to **stop the flight
-   and do the §4 game work** — rewarded skip-level after 2–3 losses, easier
-   levels 1–5, earlier ad gate. **Do not act on it without Ahmed's word;** it
-   overrides `MARKETING_PLAN.md` §2.3's hands-off-until-13-Sep rule.
+0. **✅ 1.0.8 is approved and live** (verified 3 Sep). The data-safety fix
+   worked. Nothing to watch there any more.
+1. **Read `marketing/FLIGHT1_READ_2026-09-03.md`** — it is the current state
+   of the whole marketing plan and the reasoning behind everything above.
+   Then watch whether 1.0.9 moves the two numbers that matter:
+   **`ad_shown` users / `first_open` users** (was 8%) and
+   **`finish_level_5` / installs** (was 8%). Flight 2 restarts only when the
+   second clears 15% on organic traffic.
 2. **AppLovin SDK key** (Ahmed was locked out of max.applovin.com; reset
    pending). When available: `applovin.sdk.key` meta-data in
    `AndroidManifest.xml` + AppLovin as a *waterfall* source in the three
