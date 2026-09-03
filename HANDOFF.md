@@ -9,7 +9,8 @@ Session records: `chat_history/`. Marketing: `marketing/MARKETING_PLAN.md`.
 
 | | |
 |---|---|
-| **Google Play** | **LIVE.** Production = 1.0.7 (code 7). **1.0.8 (code 8) was REJECTED** for an invalid Data safety form, **fixed and re-sent for review 1 Sep** — see "The data-safety rejection" below. Listing art = 1.0.7 palette. **Install campaign `Coloro-AC1-Install-Flight1` ENABLED 1 Sep** — no campaign edits until it completes 13 Sep. |
+| **Google Play** | **LIVE — production = 1.0.8 (code 8), approved and available** (verified 3 Sep). It had been rejected 1 Sep for an invalid Data safety form; the corrected form cleared review — see "The data-safety rejection" below. Also on internal testing. Listing art = 1.0.7 palette. |
+| **Flight 1** | Ran 1–2 Sep. **CPI $0.30 (on plan) but the funnel fails both value gates** — full read in `marketing/FLIGHT1_READ_2026-09-03.md`. **Recommendation to stop the flight is with Ahmed and not executed;** the campaign is still enabled. |
 | **App Store** | Old-palette queue entry removed 1 Sep; **1.0.7 (build 7, fixed palette) submitted, Waiting for Review**, auto-release on approval. No mediation on iOS by design. |
 | **Monetization** | **Unity Ads bidding live in 3 AdMob mediation groups** (banner/interstitial/rewarded, Android). AppLovin pending its SDK key (waterfall only — no AdMob bidding). House campaign `Coloro-House-CrossPromo` running (4/9 sizes). Baseline eCPM recorded pre-mediation. Details: `chat_history/2026-09-01-mediation-and-releases-session.md`. |
 | **Git** | ✅ Clean and pushed. `39cc662` = 1.0.7 as shipped; `29f95a1` = 1.0.8 mediation. |
@@ -91,27 +92,38 @@ hand afterwards.
 
 ## ▶ Where to resume (next session, in value order)
 
-1. **Watch the 1.0.8 re-review** (sent 1 Sep, ≤7 days). Play Console →
-   Publishing overview should show "changes under review", and *Policy
-   status* → the data-safety issue should clear itself once Google sees the
-   corrected form. If it is rejected again, the next suspect is the hosted
-   privacy policy above, not the form.
+0. **✅ 1.0.8 is approved and live** (verified 3 Sep — production track shows
+   "متوفر على Google Play", publishing overview clean, no policy issues). The
+   data-safety fix worked. Nothing to watch here any more.
+1. **The Flight 1 decision is Ahmed's and is open.** Read
+   `marketing/FLIGHT1_READ_2026-09-03.md` first — it is the current state of
+   the whole marketing plan. Headline: acquisition works (CPI $0.30, 9.2%
+   CTR), the funnel does not (8% of installs reach level 5, 92% never see an
+   ad, $34 spent → $0.28 earned). The recommendation is to **stop the flight
+   and do the §4 game work** — rewarded skip-level after 2–3 losses, easier
+   levels 1–5, earlier ad gate. **Do not act on it without Ahmed's word;** it
+   overrides `MARKETING_PLAN.md` §2.3's hands-off-until-13-Sep rule.
 2. **AppLovin SDK key** (Ahmed was locked out of max.applovin.com; reset
    pending). When available: `applovin.sdk.key` meta-data in
    `AndroidManifest.xml` + AppLovin as a *waterfall* source in the three
    mediation groups (it does not bid on AdMob) → ship as 1.0.9.
-3. **Check the reviews**: Play 1.0.8 rollout; Apple 1.0.7 (auto-releases).
-   When iOS is live: declare the iOS platform in the Meta app
-   (`marketing/docs/facebook-app-events.md` §1b) and plan iOS mediation
-   behind a real ATT flow.
-4. **13 Sep**: the Google Ads flight completes — read against
-   `marketing/MARKETING_PLAN.md` §2.5 kill criteria. Until then: hands off.
-5. **~8 Sep**: compare mediation vs the baseline table in
-   `chat_history/2026-09-01-mediation-and-releases-session.md` §5.
-6. Ahmed's own list: **host the Coloro privacy policy** (above); Unity payout
-   profile; revoke the 3 unknown "Windows"
-   browsers in the Claude extension; 5 remaining house-ad sizes (any
-   session can click those through).
+3. **Check Apple**: 1.0.7 (auto-releases). When iOS is live: declare the iOS
+   platform in the Meta app (`marketing/docs/facebook-app-events.md` §1b) and
+   plan iOS mediation behind a real ATT flow.
+4. **13 Sep**: if the flight was left running, it completes — read against
+   `marketing/MARKETING_PLAN.md` §2.5. (The 3 Sep read already failed two of
+   the three gates; see item 1.)
+5. **Mediation cannot be evaluated yet.** Unity has served *zero* impressions
+   because the whole app only produced 56 in 1–3 Sep. Comparing against the
+   baseline table in `chat_history/2026-09-01-mediation-and-releases-session.md`
+   §5 is meaningless until impression volume exists — which is the funnel
+   problem, not a mediation problem.
+6. Ahmed's own list: **add AdMob bank details** (identity verified and
+   threshold reached, but nothing can be paid out without them); **host the
+   Coloro privacy policy** (above); Unity payout profile; revoke the 3 unknown
+   "Windows" browsers in the Claude extension; 5 remaining house-ad sizes —
+   though note the house campaign delivered 511 impressions and **0 installs**
+   in a week, so more sizes may not be the fix (see the flight read §1).
 
 ---
 
